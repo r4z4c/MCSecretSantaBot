@@ -321,9 +321,9 @@ def secretsanta():
 
     updater.start_polling()
 
-    updater.idle()
-
     print "intialized" 
+
+    updater.idle()
 
 def main():
 	secretsanta()
