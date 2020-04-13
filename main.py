@@ -296,32 +296,34 @@ def unknown(bot, update):
 	bot.send_message(chat_id=update.message.chat_id, text="Sorry, I didn't understand that command.")
 
 def secretsanta():
-	#---setup---
+    #---setup---
 
-	# Remember to initialize the class.
-	filter_reply = FilterReply()
+    # Remember to initialize the class.
+    filter_reply = FilterReply()
 
-        #set telegram updater
-        updater = Updater(token=TOKEN.token, use_context=True)
+    #set telegram updater
+    updater = Updater(token=TOKEN.token, use_context=True)
 
-        #easy name for dispatcher
-        dp = updater.dispatcher
+    #easy name for dispatcher
+    dp = updater.dispatcher
 
-        dp.add_error_handler(error)
-	dp.add_handler(CommandHandler('help', help))
-        dp.add_handler(CommandHandler('start', start))
-	dp.add_handler(CommandHandler('creategame', creategame, pass_args=True))
-        dp.add_handler(CallbackQueryHandler(buttonHandler))
-	dp.add_handler(CommandHandler('gamerules', gamerules))
-	dp.add_handler(CommandHandler('feedback', feedback))
-	dp.add_handler(CommandHandler('bugreport', bugreport))
-	dp.add_handler(MessageHandler(Filters.command, unknown))
-	dp.add_handler(MessageHandler(filter_reply, reply))
-        #---start-bot---
+    dp.add_error_handler(error)
+    dp.add_handler(CommandHandler('help', help))
+    dp.add_handler(CommandHandler('start', start))
+    dp.add_handler(CommandHandler('creategame', creategame, pass_args=True))
+    dp.add_handler(CallbackQueryHandler(buttonHandler))
+    dp.add_handler(CommandHandler('gamerules', gamerules))
+    dp.add_handler(CommandHandler('feedback', feedback))
+    dp.add_handler(CommandHandler('bugreport', bugreport))
+    dp.add_handler(MessageHandler(Filters.command, unknown))
+    dp.add_handler(MessageHandler(filter_reply, reply))
+    #---start-bot---
 
-        updater.start_polling()
+    updater.start_polling()
 
-        updater.idle()
+    updater.idle()
+
+    print "intialized" 
 
 def main():
 	secretsanta()
