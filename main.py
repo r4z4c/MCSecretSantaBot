@@ -132,7 +132,7 @@ def inlineKey():
         return InlineKeyboardMarkup(keyboard)
 
 
-def start(bot, update):
+def start(update, context):
 	if update.message.chat.type == "private":
 		if not checkData(bot, update, update.message):
 			bot.send_message(chat_id=update.message.chat_id, text="Welcome to MCSecretSanta type /help for more info")
@@ -288,9 +288,9 @@ def bugreport(bot, update):
 	bot.send_message(chat_id=update.message.chat_id, text="Please type in the Bugreport", reply_markup=reply_markup)
 	bug.append(update.message.chat_id)
 
-def error(bot, update, error):
+def error(update, context):
 	#Log Errors caused by Updates.
-	logger.warning('Update "%s" caused error "%s"', update, error)
+	logger.warning('Update "%s" caused error "%s"', update, context.error)
 
 def unknown(bot, update):
 	bot.send_message(chat_id=update.message.chat_id, text="Sorry, I didn't understand that command.")
