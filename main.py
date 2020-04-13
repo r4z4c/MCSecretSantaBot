@@ -302,7 +302,7 @@ def secretsanta():
 	filter_reply = FilterReply()
 
         #set telegram updater
-        updater = Updater(token=TOKEN.token)
+        updater = Updater(token=TOKEN.token, use_context=True)
 
         #easy name for dispatcher
         dp = updater.dispatcher
