@@ -134,12 +134,12 @@ def inlineKey():
 
 def start(update, context):
 	if update.message.chat.type == "private":
-		if not checkData(bot, update, update.message):
-			bot.send_message(chat_id=update.message.chat_id, text="Welcome to MCSecretSanta type /help for more info")
+		if not checkData(context.bot, update, update.message):
+			context.bot.send_message(chat_id=update.message.chat_id, text="Welcome to MCSecretSanta type /help for more info")
 		else:
-			bot.send_message(chat_id=update.message.chat_id, text="Welcome back "+update.message.from_user.first_name+" "+update.message.from_user.last_name)
+			context.bot.send_message(chat_id=update.message.chat_id, text="Welcome back "+update.message.from_user.first_name+" "+update.message.from_user.last_name)
 	else:
-		bot.send_message(chat_id=update.message.chat_id, text="I'm sorry, this only works in privat chat with me!")
+		context.bot.send_message(chat_id=update.message.chat_id, text="I'm sorry, this only works in privat chat with me!")
 
 
 def creategame(bot, update, args):
