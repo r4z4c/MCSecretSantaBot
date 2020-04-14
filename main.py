@@ -151,7 +151,7 @@ def creategame(update, context):
 			pass
 
 		if not gName == "":
-			initgame(bot, update, gName)
+			initgame(update, context, gName)
 		else:
 			context.bot.send_message(chat_id=update.message.chat_id, reply_to_message_id=update.message.message_id, text="Type in the game name")
        		gcreate.append(update.message.chat_id)
@@ -253,7 +253,7 @@ def buttonHandler(update, context):
 def initgame(update, context, gName):
        	cur = db.tquery("INSERT INTO game (g_id, c_id, m_id, name, admin) VALUES (NULL, %s, %s, %s, %s)", (update.message.chat_id, update.message.message_id+1, gName, update.message.from_user.id))
         db.commit()
-        bot.send_message(chat_id=update.message.chat_id, text=gName+"\nstatus: waiting for players!\nadmin: "+("" if update.message.from_user.first_name == None else update.message.from_user.first_name)+" "+("" if update.message.from_user.last_name == None else update.message.from_user.last_name)+"\n|\nmembers:\n", reply_markup=inlineKey())
+        context.bot.send_message(chat_id=update.message.chat_id, text=gName+"\nstatus: waiting for players!\nadmin: "+("" if update.message.from_user.first_name == None else update.message.from_user.first_name)+" "+("" if update.message.from_user.last_name == None else update.message.from_user.last_name)+"\n|\nmembers:\n", reply_markup=inlineKey())
 
 def reply(update, context):
 	if update.message.chat_id in gcreate:
