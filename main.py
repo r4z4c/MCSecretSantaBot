@@ -77,6 +77,28 @@ class FilterReply(BaseFilter):
 	def filter(self, message):
 		return bool(len(gcreate)+len(feed)+len(bug))
 
+def editGame(context, gameID):
+	cur = db.tquery("SELECT message FROM game WHERE g_id = %s", (gameID,))
+	message = str(cur.fetchall()[0])
+	cur = db.tquery("SELECT u.first_name, u.last_name, u.u_id, gu.admin, gu.m_id FROM user AS u, game_user AS gu WHERE gu.u_id = u.u_id AND u.u_id = (SELECT u_id FROM game_user WHERE g_id = %s)", (gameID,))
+	tmpUser = cur.fetchall()
+	userId = []
+	admin = []
+	messageID = []
+	print tmpUser
+	for i in tmpUser:
+		message += ("\n- "tmpUser[0]+" "+tmpUser[1])
+		userID.append(tmpUser[2])
+		admin.append(tmpUser[3])
+		messageID.append()
+
+	for i in userID:
+		reply_markup = userKey()
+		if admin[i]:
+			reply_markup = adminKey()
+
+		context.bot.edit_message_text(text=message, chat_id=userID[i], message_id=messageID[i], reply_markup=reply_markup)
+
 def checkUser(update, context, message):
 	cur = db.squery("SELECT u_id FROM user")
 	allUsers = cur.fetchall()
@@ -178,28 +200,25 @@ def buttonHandler(update, context):
 			isMember = True
 			cur = db.tquery("SELECT u_id, first_name, last_name FROM user WHERE u_id = (SELECT u_id FROM game_user WHERE g_id = %s)", (gameId,))
 			gameUser = cur.fetchall()
-			print gameUser
 			userID = []
 			userName = []
 			for i in range(len(gameUser)):
 				userID.append(gameUser[i][0])
 				userID.append(gameUser[i][1]+" "+gameUser[i][2])
-			print userID
 
 			if theUser.id in userID:
 				sql = "DELETE FROM game_user WHERE g_id = %s AND u_id = %s"
 				tuple = (gameId, theUser.id)
 				cur = db.tquery(sql, tuple)
 				db.commit()
-				context.bot.edit_message_text(text=message, chat_id=query.message.chat_id, message_id=query.message.message_id, reply_markup=reply_markup)
-				isMember = False
+				editGame(context, gameId)
 
 			else:
-				sql = "INSERT INTO game_user (gu_id, g_id, u_id) VALUES (NULL, %s, %s)"
+				sql = "INSERT INTO game_user (gu_id, admin, g_id, u_id) VALUES (NULL, 1, %s, %s)"
 				tuple = (gameId, theUser.id)
 				cur = db.tquery(sql, tuple)
 				db.commit()
-				context.bot.edit_message_text(text=message+"\n - "+theUser.first_name, chat_id=query.message.chat_id, message_id=query.message.message_id, reply_markup=reply_markup)
+				editGame(context, gameId)
 
 		elif query.data == '2':
 			cur = db.tquery("SELECT u_id FROM game_user WHERE g_id = %s", (gameId,))
