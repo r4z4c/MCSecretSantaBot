@@ -162,7 +162,7 @@ def buttonHandler(update, context):
 	if checkData(query, context, query, save=False):
 	        reply_markup = inlineKey()
 
-		theUser = query.from
+		theUser = query.from_user
 		theMessage = query.message.text
 
 		sql = "SELECT g_id, admin, name FROM game WHERE c_id = %s AND m_id = %s"
