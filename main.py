@@ -151,7 +151,7 @@ def join(update, context):
 		except:
 			pass
 		if not gName == "":
-
+			pass
 		else:
 			context.bot.send_message(chat_id=update.message.chat_id, reply_to_message_id=update.message.message_id, text="Type in the game name")
 			checkReply(update)
