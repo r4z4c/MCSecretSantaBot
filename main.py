@@ -66,6 +66,7 @@ if DEBUG == True:
 
 #variables
 gcreate = []
+gjoin = []
 feed = []
 bug = []
 
@@ -92,6 +93,8 @@ def checkUser(update, context, message):
 def checkReply(update):
 	if update.message.chat_id in gcreate:
 		gcreate.remove(update.message.chat_id)
+	if update.message.chat_id in gjoin:
+		gjoin.remove(update.message.chat_id)
 	if update.message.chat_id in feed:
 		feed.remove(update.message.chat_id)
 	if update.message.chat_id in bug:
@@ -140,6 +143,20 @@ def creategame(update, context):
 			checkReply(update)
 			gcreate.append(update.message.chat_id)
 
+def join(update, context):
+	if checkUser(update, context, update.message):
+		gName = ""
+		try:
+			gName = context.args[0]
+		except:
+			pass
+		if not gName == "":
+
+		else:
+			context.bot.send_message(chat_id=update.message.chat_id, reply_to_message_id=update.message.message_id, text="Type in the game name")
+			checkReply(update)
+			gjoin.append(update.message.chat_id)
+
 def buttonHandler(update, context):
 	query = update.callback_query
 
@@ -149,15 +166,18 @@ def buttonHandler(update, context):
 		theUser = query.from_user
 		theMessage = query.message.text
 
-		sql = "SELECT g_id, name FROM game WHERE u_id = %s AND m_id = %s"
+		sql = "SELECT g_id, name, message FROM game WHERE u_id = %s AND m_id = %s"
 		tuple = (query.message.chat_id, query.message.message_id)
 		cur = db.tquery(sql, tuple)
 		sql = cur.fetchall()
 		gameId = sql[0][0]
 		theGame = sql[0][1]
+		message = sql[0][2]
 
 		if query.data == '1':
 			isMember = True
+			if theUser.first_name in theMessage:
+				print Ist da
 			for i in range(0, len(theMessage)):
 				if theMessage[i:i+len(theUser.first_name)+2] == "- "+theUser.first_name:
 					theMessage = theMessage[0:i-1]+theMessage[i+len(theUser.first_name)+3:len(theMessage)]
@@ -222,14 +242,36 @@ def buttonHandler(update, context):
 			context.bot.edit_message_text(chat_id=query.message.chat_id, text=theMessage, message_id=query.message.message_id)
 
 def initgame(update, context, gName):
-	cur = db.tquery("INSERT INTO game (g_id, u_id, m_id, name) VALUES (NULL, %s, %s, %s)", (update.message.chat_id, update.message.message_id+1, gName))
+	message = "game: "+gName+"\nstatus: waiting for players!\nadmin: "+("" if update.message.from_user.first_name == None else update.message.from_user.first_name)+" "+("" if update.message.from_user.last_name == None else update.message.from_user.last_name)+"\n\nmembers:\n"
+	cur = db.tquery("INSERT INTO game (g_id, u_id, m_id, name, message) VALUES (NULL, %s, %s, %s)", (update.message.chat_id, update.message.message_id+1, gName, message))
 	db.commit()
-	context.bot.send_message(chat_id=update.message.chat_id, text="game: "+gName+"\nstatus: waiting for players!\nadmin: "+("" if update.message.from_user.first_name == None else update.message.from_user.first_name)+" "+("" if update.message.from_user.last_name == None else update.message.from_user.last_name)+"\n\nmembers:\n", reply_markup=adminKey())
+	context.bot.send_message(chat_id=update.message.chat_id, text=message, reply_markup=adminKey())
+
+def joingame(update, context, gName):
+	cur = db.tquery("SELECT message FROM game WHERE name = %s)", (gName,))
+	message = cur.fetchall()[0][0]
+	cur = db.tquery("INSERT INTO game (g_id, u_id, m_id, name, message) VALUES (NULL, %s, %s, %s)", (update.message.chat_id, update.message.message_id+1, gName, message))
+	db.commit()
+	context.bot.send_message(chat_id=update.message.chat_id, text=message, reply_markup=adminKey())
 
 def reply(update, context):
 	if update.message.chat_id in gcreate:
-		initgame(update, context, update.message.text)
-		gcreate.remove(update.message.chat_id)
+		cur = db.tquery("SELECT name FROM game")
+		gName = cur.fetchall()
+		if update.message.text in fName:
+			context.bot.send_message(chat_id=update.message.chat_id, text="A game with this name is already running!\nPlease type in a different name.")
+		else:
+			initgame(update, context, update.message.text)
+			gcreate.remove(update.message.chat_id)
+
+	if update.message.chat_id in gjoin:
+		cur = db.tquery("SELECT name FROM game")
+		gName = cur.fetchall()
+		if update.message.text in fName:
+			joingame(update, context, update.message.text)
+			gjoin.remove(update.message.chat_id)
+		else:
+			context.bot.send_message(chat_id=update.message.chat_id, text="A game with this name does not exist!\nPlease type in a existing gamename.")
 
 	if update.message.chat_id in feed:
 		context.bot.send_message(chat_id=update.message.chat_id, text="Thank you for your feedback, I appreciate your time and thank you for using the bot.")
@@ -277,6 +319,7 @@ def secretsanta():
 	dp.add_handler(CommandHandler('help', help))
 	dp.add_handler(CommandHandler('start', start))
 	dp.add_handler(CommandHandler('creategame', creategame, pass_args=True))
+	dp.add_handler(CommandHandler('join', join, pass_args=True))
 	dp.add_handler(CallbackQueryHandler(buttonHandler))
 	dp.add_handler(CommandHandler('gamerules', gamerules))
 	dp.add_handler(CommandHandler('feedback', feedback))
@@ -286,6 +329,7 @@ def secretsanta():
 
 	#---start-bot---
 	updater.start_polling()
+	print "\nstarted"
 	updater.idle()
 
 def main():
