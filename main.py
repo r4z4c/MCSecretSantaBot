@@ -176,8 +176,9 @@ def buttonHandler(update, context):
 
 		if query.data == '1':
 			isMember = True
-			a = theMessage.split("- ")
-			print a[1]
+			cur = db.tquery("SELECT u_id FROM game_user WHERE g_id = %s", (gameId,))
+			gameUser = cur.fetchall()
+			print gameUser.type
 			for i in range(0, len(theMessage)):
 				if theMessage[i:i+len(theUser.first_name)+2] == "- "+theUser.first_name:
 					theMessage = theMessage[0:i-1]+theMessage[i+len(theUser.first_name)+3:len(theMessage)]
@@ -197,7 +198,7 @@ def buttonHandler(update, context):
 				context.bot.edit_message_text(text=theMessage+"\n - "+theUser.first_name, chat_id=query.message.chat_id, message_id=query.message.message_id, reply_markup=reply_markup)
 
 		elif query.data == '2':
-			cur = db.tquery("SELECT u_id FROM game_user WHERE g_id = (SELECT g_id FROM game WHERE g_id = %s)", (gameId,))
+			cur = db.tquery("SELECT u_id FROM game_user WHERE g_id = %s", (gameId,))
 			tmpUser = cur.fetchall()
 			gameUser = []
 			for i in range(len(tmpUser)):
