@@ -178,7 +178,7 @@ def buttonHandler(update, context):
 			isMember = True
 			cur = db.tquery("SELECT u_id FROM game_user WHERE g_id = %s", (gameId,))
 			gameUser = cur.fetchall()
-			print gameUser.type
+			print gameUser
 			for i in range(0, len(theMessage)):
 				if theMessage[i:i+len(theUser.first_name)+2] == "- "+theUser.first_name:
 					theMessage = theMessage[0:i-1]+theMessage[i+len(theUser.first_name)+3:len(theMessage)]
