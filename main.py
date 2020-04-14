@@ -150,14 +150,11 @@ def creategame(update, context):
 		except:
 			pass
 
-		if update.message.chat.type == "private" or update.message.chat.type == "channel":
-			context.bot.send_message(chat_id=update.message.chat_id, reply_to_message_id=update.message.message_id, text="Please add the Bot to a group and then type /creategame again")
+		if not gName == "":
+			initgame(bot, update, gName)
 		else:
-			if not gName == "":
-				initgame(bot, update, gName)
-			else:
-				context.bot.send_message(chat_id=update.message.chat_id, reply_to_message_id=update.message.message_id, text="Type in the game name")
-       				gcreate.append(update.message.chat_id)
+			context.bot.send_message(chat_id=update.message.chat_id, reply_to_message_id=update.message.message_id, text="Type in the game name")
+       		gcreate.append(update.message.chat_id)
 
 def buttonHandler(update, context):
 	query = update.callback_query
@@ -165,7 +162,7 @@ def buttonHandler(update, context):
 	if checkData(query, context, query, save=False):
 	        reply_markup = inlineKey()
 
-		theUser = query.from_user
+		theUser = query.from
 		theMessage = query.message.text
 
 		sql = "SELECT g_id, admin, name FROM game WHERE c_id = %s AND m_id = %s"
@@ -256,7 +253,7 @@ def buttonHandler(update, context):
 def initgame(update, context, gName):
        	cur = db.tquery("INSERT INTO game (g_id, c_id, m_id, name, admin) VALUES (NULL, %s, %s, %s, %s)", (update.message.chat_id, update.message.message_id+1, gName, update.message.from_user.id))
         db.commit()
-        bot.send_message(chat_id=update.message.chat_id, text=gName+"\nstatus: waiting for players!\nadmin: "+("" if update.message.from_user.first_name == None else update.message.from_user.first_name)+" "+("" if update.message.from_user.last_name == None else update.message.from_user.last_name)+"\n|\nmembers:\n", reply_markup=inlineKey())
+        bot.send_message(chat_id=update.message.chat_id, text=gName+"\nstatus: waiting for players!\nadmin: "+("" if update.message.from.first_name == None else update.message.from.first_name)+" "+("" if update.message.from_user.last_name == None else update.message.from_user.last_name)+"\n|\nmembers:\n", reply_markup=inlineKey())
 
 def reply(update, context):
 	if update.message.chat_id in gcreate:
