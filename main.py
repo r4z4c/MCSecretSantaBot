@@ -84,37 +84,22 @@ def checkUser(update, context, message):
 		cur = db.tquery("INSERT INTO user (u_id, first_name, last_name, username) VALUES (%s, %s, %s, %s)", (message.from_user.id, message.from_user.first_name, message.from_user.last_name, message.from_user.username))
 		db.commit()
 
-	cur = db.squery("SELECT c_id FROM chat")
-	allChats = cur.fetchall()
-	theChats = []
-	for row in allChats:
-		theChats.append(long(row[0]))
-
-	if long(update.message.chat_id) not in theChats:
-		cur = db.tquery("INSERT INTO chat (c_id, u_id, type) VALUES (%s, %s, %s)", (update.message.chat_id, message.from_user.id, update.message.chat.type))
-		db.commit()
-
 	return True
 
-def rtd(context, theChat, theGame):
-	theUser = []
-	for i in range(len(theChat)):
-		cur = db.tquery("SELECT first_name, last_name FROM user WHERE u_id = (SELECT u_id FROM chat WHERE c_id = %s)", (theChat[i],))
-		theUser.append(cur.fetchall()[0][0])
-
-	tmpUser = copy.deepcopy(theUser)
+def rtd(context, gameUser, theGame):
+	tmpUser = copy.deepcopy(gameUser)
 	randa = []
 	a = True
 	while a:
 		random.shuffle(tmpUser)
 		a = False
 		for j in range(0, len(tmpUser)):
-			if theUser[j] == tmpUser[j]:
+			if gameUser[j] == tmpUser[j]:
 				a = True
 
 
-	for t in range(0, len(theUser)):
-		context.bot.send_message(chat_id=theChat[t], text="Hey "+ theUser[t]+", the Player I chose for you, in the game '"+theGame+"' , is "+tmpUser[t])
+	for i in range(0, len(gameUser)):
+		context.bot.send_message(chat_id=gameUser[i], text="Hey "+ gameUser[i]+", the Player I chose for you in the game '"+theGame+"' is "+tmpUser[i])
 
 def adminKey():
 	keyboard = [[InlineKeyboardButton("Join/Exit", callback_data='1')],[InlineKeyboardButton("Start", callback_data='2'), InlineKeyboardButton("Abort", callback_data='3')]]
@@ -152,7 +137,7 @@ def buttonHandler(update, context):
 		theUser = query.from_user
 		theMessage = query.message.text
 
-		sql = "SELECT g_id, name FROM game WHERE c_id = %s AND m_id = %s"
+		sql = "SELECT g_id, name FROM game WHERE u_id = %s AND m_id = %s"
 		tuple = (query.message.chat_id, query.message.message_id)
 		cur = db.tquery(sql, tuple)
 		sql = cur.fetchall()
@@ -181,14 +166,13 @@ def buttonHandler(update, context):
 
 		elif query.data == '2':
 			cur = db.tquery("SELECT u_id FROM game_user WHERE g_id = (SELECT g_id FROM game WHERE g_id = %s)", (gameId,))
-			GameUser = cur.fetchall()
-			theChat = []
-			for i in range(len(GameUser)):
-				cur = db.tquery("SELECT c_id FROM chat WHERE u_id = (SELECT u_id FROM user WHERE u_id = %s)", (GameUser[i][0],))
-				theChat.append(cur.fetchall()[0][0])
+			tmpUser = cur.fetchall()
+			gameUser = []
+			for i in range(len(tmpUser)):
+				gameUser.append(tmpUser[i][0])
 
-			if len(theChat) > 2:
-				rtd(context, theChat, theGame)
+			if len(gameUser) > 2:
+				rtd(context, gameUser, theGame)
 				for i in range(0, len(theMessage)):
 					if theMessage[i:i+6] == "status":
 						for j in range(i, len(theMessage)):
@@ -226,7 +210,7 @@ def buttonHandler(update, context):
 			context.bot.edit_message_text(chat_id=query.message.chat_id, text=theMessage, message_id=query.message.message_id)
 
 def initgame(update, context, gName):
-	cur = db.tquery("INSERT INTO game (g_id, c_id, m_id, name) VALUES (NULL, %s, %s, %s)", (update.message.chat_id, update.message.message_id+1, gName))
+	cur = db.tquery("INSERT INTO game (g_id, u_id, m_id, name) VALUES (NULL, %s, %s, %s)", (update.message.chat_id, update.message.message_id+1, gName))
 	db.commit()
 	context.bot.send_message(chat_id=update.message.chat_id, text="game: "+gName+"\nstatus: waiting for players!\nadmin: "+("" if update.message.from_user.first_name == None else update.message.from_user.first_name)+" "+("" if update.message.from_user.last_name == None else update.message.from_user.last_name)+"\n\nmembers:\n", reply_markup=adminKey())
 
