@@ -79,7 +79,7 @@ class FilterReply(BaseFilter):
 
 def updateMessage(context, gameID):
 	cur = db.tquery("SELECT message FROM game WHERE g_id = %s", (gameID,))
-	message = str(cur.fetchall()[0])
+	message = cur.fetchall()[0]
 	cur = db.tquery("SELECT u.first_name, u.last_name, u.u_id, gu.admin, gu.m_id FROM user AS u, game_user AS gu WHERE gu.u_id = u.u_id AND u.u_id = (SELECT u_id FROM game_user WHERE g_id = %s)", (gameID,))
 	tmpUser = cur.fetchall()
 	userId = []
