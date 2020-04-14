@@ -111,7 +111,7 @@ def adminKey():
 
 def start(update, context):
 	if update.message.chat.type == "private":
-		checkUser(update, context, update.message):
+		checkUser(update, context, update.message)
 		context.bot.send_message(chat_id=update.message.chat_id, text="Welcome to MCSecretSantaBot type /help for more info's")
 	else:
 		context.bot.send_message(chat_id=update.message.chat_id, text="I'm sorry, this only works in private chat with me!")
