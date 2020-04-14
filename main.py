@@ -87,7 +87,7 @@ def updateMessage(context, gameID):
 	messageID = []
 	print tmpUser
 	for i in tmpUser:
-		message += ("\n- "tmpUser[0]+" "+tmpUser[1])
+		message += ("\n- "+tmpUser[0]+" "+tmpUser[1])
 		userID.append(tmpUser[2])
 		admin.append(tmpUser[3])
 		messageID.append()
