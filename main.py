@@ -152,13 +152,12 @@ def buttonHandler(update, context):
 		theUser = query.from_user
 		theMessage = query.message.text
 
-		sql = "SELECT g_id, admin, name FROM game WHERE c_id = %s AND m_id = %s"
+		sql = "SELECT g_id, name FROM game WHERE c_id = %s AND m_id = %s"
 		tuple = (query.message.chat_id, query.message.message_id)
 		cur = db.tquery(sql, tuple)
 		sql = cur.fetchall()
 		gameId = sql[0][0]
-		adminId = sql[0][1]
-		theGame = sql[0][2]
+		theGame = sql[0][1]
 
 		if query.data == '1':
 			isMember = True
@@ -181,57 +180,55 @@ def buttonHandler(update, context):
 				context.bot.edit_message_text(text=theMessage+"\n - "+theUser.first_name, chat_id=query.message.chat_id, message_id=query.message.message_id, reply_markup=reply_markup)
 
 		elif query.data == '2':
-			if adminId == theUser.id:
-				cur = db.tquery("SELECT u_id FROM game_user WHERE g_id = (SELECT g_id FROM game WHERE g_id = %s)", (gameId,))
-				GameUser = cur.fetchall()
-				theChat = []
-				for i in range(len(GameUser)):
-					cur = db.tquery("SELECT c_id FROM chat WHERE u_id = (SELECT u_id FROM user WHERE u_id = %s)", (GameUser[i][0],))
-					theChat.append(cur.fetchall()[0][0])
+			cur = db.tquery("SELECT u_id FROM game_user WHERE g_id = (SELECT g_id FROM game WHERE g_id = %s)", (gameId,))
+			GameUser = cur.fetchall()
+			theChat = []
+			for i in range(len(GameUser)):
+				cur = db.tquery("SELECT c_id FROM chat WHERE u_id = (SELECT u_id FROM user WHERE u_id = %s)", (GameUser[i][0],))
+				theChat.append(cur.fetchall()[0][0])
 
-				if len(theChat) > 2:
-					rtd(context, theChat, theGame)
-					for i in range(0, len(theMessage)):
-						if theMessage[i:i+6] == "status":
-							for j in range(i, len(theMessage)):
-								if theMessage[j] == '!':
-									bg = theMessage[0:i+8]
-									en = theMessage[j+1:len(theMessage)]
-									theMessage = bg + "started!" + en
-									break
- 							break
-
-					cur = db.tquery("DELETE FROM game_user WHERE g_id = %s", (gameId,))
-					db.commit()
-					cur = db.tquery("DELETE FROM game WHERE g_id = %s", (gameId,))
-					db.commit()
-
-					context.bot.edit_message_text(chat_id=query.message.chat_id, text=theMessage, message_id=query.message.message_id)
-				else:
-					context.bot.send_message(chat_id=query.message.chat_id, text="I'm Sorry, this game does only make sense with 3 or more Players")
-
-		elif query.data == '3':
-			if adminId == theUser.id:
+			if len(theChat) > 2:
+				rtd(context, theChat, theGame)
 				for i in range(0, len(theMessage)):
 					if theMessage[i:i+6] == "status":
 						for j in range(i, len(theMessage)):
 							if theMessage[j] == '!':
 								bg = theMessage[0:i+8]
 								en = theMessage[j+1:len(theMessage)]
-								theMessage = bg + "aborted!" + en
+								theMessage = bg + "started!" + en
 								break
 						break
+
 				cur = db.tquery("DELETE FROM game_user WHERE g_id = %s", (gameId,))
 				db.commit()
 				cur = db.tquery("DELETE FROM game WHERE g_id = %s", (gameId,))
 				db.commit()
 
 				context.bot.edit_message_text(chat_id=query.message.chat_id, text=theMessage, message_id=query.message.message_id)
+			else:
+				context.bot.send_message(chat_id=query.message.chat_id, text="I'm Sorry, this game does only make sense with 3 or more Players")
+
+		elif query.data == '3':
+			for i in range(0, len(theMessage)):
+				if theMessage[i:i+6] == "status":
+					for j in range(i, len(theMessage)):
+						if theMessage[j] == '!':
+							bg = theMessage[0:i+8]
+							en = theMessage[j+1:len(theMessage)]
+							theMessage = bg + "aborted!" + en
+							break
+					break
+			cur = db.tquery("DELETE FROM game_user WHERE g_id = %s", (gameId,))
+			db.commit()
+			cur = db.tquery("DELETE FROM game WHERE g_id = %s", (gameId,))
+			db.commit()
+
+			context.bot.edit_message_text(chat_id=query.message.chat_id, text=theMessage, message_id=query.message.message_id)
 
 def initgame(update, context, gName):
-	cur = db.tquery("INSERT INTO game (g_id, c_id, m_id, name, admin) VALUES (NULL, %s, %s, %s, %s)", (update.message.chat_id, update.message.message_id+1, gName, update.message.from_user.id))
+	cur = db.tquery("INSERT INTO game (g_id, c_id, m_id, name) VALUES (NULL, %s, %s, %s)", (update.message.chat_id, update.message.message_id+1, gName))
 	db.commit()
-	context.bot.send_message(chat_id=update.message.chat_id, text="game: "+gName+"\nstatus: waiting for players!\nadmin: "+("" if update.message.from_user.first_name == None else update.message.from_user.first_name)+" "+("" if update.message.from_user.last_name == None else update.message.from_user.last_name)+"\n|\nmembers:\n", reply_markup=adminKey())
+	context.bot.send_message(chat_id=update.message.chat_id, text="game: "+gName+"\nstatus: waiting for players!\nadmin: "+("" if update.message.from_user.first_name == None else update.message.from_user.first_name)+" "+("" if update.message.from_user.last_name == None else update.message.from_user.last_name)+"\n\nmembers:\n", reply_markup=adminKey())
 
 def reply(update, context):
 	if update.message.chat_id in gcreate:
