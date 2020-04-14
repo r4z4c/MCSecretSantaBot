@@ -73,21 +73,16 @@ class FilterReply(BaseFilter):
 	def filter(self, message):
 		return bool(len(gcreate)+len(feed)+len(bug))
 
-def checkData(update, context, message, save=True):
+def checkUser(update, context, message):
 	cur = db.squery("SELECT u_id FROM user")
 	allUsers = cur.fetchall()
 	theUsers = []
-	isSaved = True
 	for row in allUsers:
 		theUsers.append(int(row[0]))
 
 	if message.from_user.id not in theUsers:
-		if save:
-			cur = db.tquery("INSERT INTO user (u_id, first_name, last_name, username) VALUES (%s, %s, %s, %s)", (message.from_user.id, message.from_user.first_name, message.from_user.last_name, message.from_user.username))
-			db.commit()
-		if not update.message.chat.type == "private":
-			context.bot.send_message(chat_id=update.message.chat_id, text="Please go to @MCSecretSantaBot first and type in /start")
-		isSaved = False
+		cur = db.tquery("INSERT INTO user (u_id, first_name, last_name, username) VALUES (%s, %s, %s, %s)", (message.from_user.id, message.from_user.first_name, message.from_user.last_name, message.from_user.username))
+		db.commit()
 
 	cur = db.squery("SELECT c_id FROM chat")
 	allChats = cur.fetchall()
@@ -96,16 +91,10 @@ def checkData(update, context, message, save=True):
 		theChats.append(long(row[0]))
 
 	if long(update.message.chat_id) not in theChats:
-		if update.message.chat.type == "private":
-			if save:
-				cur = db.tquery("INSERT INTO chat (c_id, u_id, type) VALUES (%s, %s, %s)", (update.message.chat_id, message.from_user.id, update.message.chat.type))
-				db.commit()
-			isSaved = False
-		else:
-			cur = db.tquery("INSERT INTO chat (c_id, u_id, type) VALUES (%s, %s, %s)", (update.message.chat_id, 0, update.message.chat.type))
-			db.commit()
+		cur = db.tquery("INSERT INTO chat (c_id, u_id, type) VALUES (%s, %s, %s)", (update.message.chat_id, message.from_user.id, update.message.chat.type))
+		db.commit()
 
-	return isSaved
+	return True
 
 def rtd(context, theChat, theGame):
 	theUser = []
@@ -134,16 +123,14 @@ def adminKey():
 
 def start(update, context):
 	if update.message.chat.type == "private":
-		if not checkData(update, context, update.message):
-			context.bot.send_message(chat_id=update.message.chat_id, text="Welcome to MCSecretSanta type /help for more info")
-		else:
-			context.bot.send_message(chat_id=update.message.chat_id, text="Welcome back "+update.message.from_user.first_name+" "+update.message.from_user.last_name)
+		if not checkUser(update, context, update.message):
+			context.bot.send_message(chat_id=update.message.chat_id, text="Welcome to MCSecretSantaBot type /help for more info's")
 	else:
-		context.bot.send_message(chat_id=update.message.chat_id, text="I'm sorry, this only works in privat chat with me!")
+		context.bot.send_message(chat_id=update.message.chat_id, text="I'm sorry, this only works in private chat with me!")
 
 
 def creategame(update, context):
-	if checkData(update, context, update.message, save=False):
+	if checkUser(update, context, update.message):
 		gName = ""
 		try:
 			gName = context.args[0]
@@ -159,7 +146,7 @@ def creategame(update, context):
 def buttonHandler(update, context):
 	query = update.callback_query
 
-	if checkData(query, context, query, save=False):
+	if checkUser(query, context, query):
 		reply_markup = adminKey()
 
 		theUser = query.from_user
@@ -223,11 +210,6 @@ def buttonHandler(update, context):
 				else:
 					context.bot.send_message(chat_id=query.message.chat_id, text="I'm Sorry, this game does only make sense with 3 or more Players")
 
-			else:
-				cur = db.tquery("SELECT m_id FROM game WHERE g_id = %s", (gameId,))
-				theMessage = cur.fetchall()[0][0]
-				context.bot.send_message(chat_id=query.message.chat_id, reply_to_message_id=theMessage, text="Sorry "+(" " if theUser.first_name == None else theUser.first_name)+" "+("" if theUser.last_name == None else theUser.last_name)+", but you are not Admin of this game!")
-
 		elif query.data == '3':
 			if adminId == theUser.id:
 				for i in range(0, len(theMessage)):
@@ -245,10 +227,6 @@ def buttonHandler(update, context):
 				db.commit()
 
 				context.bot.edit_message_text(chat_id=query.message.chat_id, text=theMessage, message_id=query.message.message_id)
-			else:
-				cur = db.tquery("SELECT m_id FROM game WHERE g_id = %s", (gameId,))
-				theMessage = cur.fetchall()[0][0]
-				context.bot.send_message(chat_id=query.message.chat_id, reply_to_message_id=theMessage, text="Sorry "+(" " if theUser.first_name == None else theUser.first_name)+("" if theUser.last_name == None else theUser.last_name)+", but you are not Admin of this game!")
 
 def initgame(update, context, gName):
 	cur = db.tquery("INSERT INTO game (g_id, c_id, m_id, name, admin) VALUES (NULL, %s, %s, %s, %s)", (update.message.chat_id, update.message.message_id+1, gName, update.message.from_user.id))
