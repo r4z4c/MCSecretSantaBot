@@ -256,7 +256,7 @@ def joingame(update, context, gName):
 
 def reply(update, context):
 	if update.message.chat_id in gcreate:
-		cur = db.tquery("SELECT name FROM game")
+		cur = db.squery("SELECT name FROM game")
 		gName = cur.fetchall()
 		if update.message.text in fName:
 			context.bot.send_message(chat_id=update.message.chat_id, text="A game with this name is already running!\nPlease type in a different name.")
@@ -265,7 +265,7 @@ def reply(update, context):
 			gcreate.remove(update.message.chat_id)
 
 	if update.message.chat_id in gjoin:
-		cur = db.tquery("SELECT name FROM game")
+		cur = db.squery("SELECT name FROM game")
 		gName = cur.fetchall()
 		if update.message.text in fName:
 			joingame(update, context, update.message.text)
