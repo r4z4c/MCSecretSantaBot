@@ -73,7 +73,7 @@ class FilterReply(BaseFilter):
 	def filter(self, message):
 		return bool(len(gcreate)+len(feed)+len(bug))
 
-def checkData(bot, update, message, save=True):
+def checkData(update, context, message, save=True):
 	cur = db.squery("SELECT u_id FROM user")
         allUsers = cur.fetchall()
         theUsers = []
@@ -86,7 +86,7 @@ def checkData(bot, update, message, save=True):
                         cur = db.tquery("INSERT INTO user (u_id, first_name, last_name, username) VALUES (%s, %s, %s, %s)", (message.from_user.id, message.from_user.first_name, message.from_user.last_name, message.from_user.username))
                         db.commit()
                 if not update.message.chat.type == "private":
-                       bot.send_message(chat_id=update.message.chat_id, text="Please go to @MCSecretSantaBot first and type in /start")
+                        context.bot.send_message(chat_id=update.message.chat_id, text="Please go to @MCSecretSantaBot first and type in /start")
                 isSaved = False
 
         cur = db.squery("SELECT c_id FROM chat")
@@ -107,7 +107,7 @@ def checkData(bot, update, message, save=True):
 
 	return isSaved
 
-def rtd(bot, theChat, theGame):
+def rtd(context, theChat, theGame):
 	theUser = []
 	for i in range(len(theChat)):
 		cur = db.tquery("SELECT first_name, last_name FROM user WHERE u_id = (SELECT u_id FROM chat WHERE c_id = %s)", (theChat[i],))
@@ -125,7 +125,7 @@ def rtd(bot, theChat, theGame):
 
 
 	for t in range(0, len(theUser)):
-		bot.send_message(chat_id=theChat[t], text="Hey "+ theUser[t]+", the Player I chose for you, in the game '"+theGame+"' , is "+tmpUser[t])
+		context.bot.send_message(chat_id=theChat[t], text="Hey "+ theUser[t]+", the Player I chose for you, in the game '"+theGame+"' , is "+tmpUser[t])
 
 def inlineKey():
 	keyboard = [[InlineKeyboardButton("Join/Exit", callback_data='1')],[InlineKeyboardButton("Start", callback_data='2'), InlineKeyboardButton("Abort", callback_data='3')]]
@@ -134,7 +134,7 @@ def inlineKey():
 
 def start(update, context):
 	if update.message.chat.type == "private":
-		if not checkData(context.bot, update, update.message):
+		if not checkData(update, context, update.message):
 			context.bot.send_message(chat_id=update.message.chat_id, text="Welcome to MCSecretSanta type /help for more info")
 		else:
 			context.bot.send_message(chat_id=update.message.chat_id, text="Welcome back "+update.message.from_user.first_name+" "+update.message.from_user.last_name)
@@ -142,8 +142,8 @@ def start(update, context):
 		context.bot.send_message(chat_id=update.message.chat_id, text="I'm sorry, this only works in privat chat with me!")
 
 
-def creategame(bot, update, args):
-	if checkData(bot, update, update.message, save=False):
+def creategame(update, context, args):
+	if checkData(update, context, update.message, save=False):
 		gName = ""
 		try:
 			gName = args[0]
@@ -151,19 +151,19 @@ def creategame(bot, update, args):
 			pass
 
 		if update.message.chat.type == "private" or update.message.chat.type == "channel":
-			bot.send_message(chat_id=update.message.chat_id, reply_to_message_id=update.message.message_id, text="Please add the Bot to a group and then type /creategame again")
+			context.bot.send_message(chat_id=update.message.chat_id, reply_to_message_id=update.message.message_id, text="Please add the Bot to a group and then type /creategame again")
 		else:
 			if not gName == "":
 				initgame(bot, update, gName)
 			else:
 				reply_markup = ForceReply(selective=True)
-				bot.send_message(chat_id=update.message.chat_id, reply_to_message_id=update.message.message_id, text="Type in the game name", reply_markup=reply_markup)
+				context.bot.send_message(chat_id=update.message.chat_id, reply_to_message_id=update.message.message_id, text="Type in the game name", reply_markup=reply_markup)
        				gcreate.append(update.message.chat_id)
 
-def buttonHandler(bot, update):
+def buttonHandler(update, context):
 	query = update.callback_query
 
-	if checkData(bot, query, query, save=False):
+	if checkData(query, context, query, save=False):
 	        reply_markup = inlineKey()
 
 		theUser = query.from_user
@@ -186,7 +186,7 @@ def buttonHandler(bot, update):
 					tuple = (gameId, theUser.id)
 					cur = db.tquery(sql, tuple)
 	                        	db.commit()
-	                        	bot.edit_message_text(text=theMessage, chat_id=query.message.chat_id, message_id=query.message.message_id, reply_markup=reply_markup)
+	                        	context.bot.edit_message_text(text=theMessage, chat_id=query.message.chat_id, message_id=query.message.message_id, reply_markup=reply_markup)
 					isMember = False
 					break
 
@@ -195,7 +195,7 @@ def buttonHandler(bot, update):
 				tuple = (gameId, theUser.id)
 				cur = db.tquery(sql, tuple)
 				db.commit()
-				bot.edit_message_text(text=theMessage+"\n - "+theUser.first_name, chat_id=query.message.chat_id, message_id=query.message.message_id, reply_markup=reply_markup)
+				context.bot.edit_message_text(text=theMessage+"\n - "+theUser.first_name, chat_id=query.message.chat_id, message_id=query.message.message_id, reply_markup=reply_markup)
 
 		elif query.data == '2':
 			if adminId == theUser.id:
@@ -207,7 +207,7 @@ def buttonHandler(bot, update):
 					theChat.append(cur.fetchall()[0][0])
 
 				if len(theChat) > 2:
-					rtd(bot, theChat, theGame)
+					rtd(context, theChat, theGame)
 					for i in range(0, len(theMessage)):
 		                                if theMessage[i:i+6] == "status":
         		                                for j in range(i, len(theMessage)):
@@ -223,14 +223,14 @@ def buttonHandler(bot, update):
         	        	        cur = db.tquery("DELETE FROM game WHERE g_id = %s", (gameId,))
         	                	db.commit()
 
-		                        bot.edit_message_text(chat_id=query.message.chat_id, text=theMessage, message_id=query.message.message_id)
+		                        context.bot.edit_message_text(chat_id=query.message.chat_id, text=theMessage, message_id=query.message.message_id)
 				else:
-					bot.send_message(chat_id=query.message.chat_id, text="I'm Sorry, this game does only make sense with 3 or more Players")
+					context.bot.send_message(chat_id=query.message.chat_id, text="I'm Sorry, this game does only make sense with 3 or more Players")
 
 			else:
 				cur = db.tquery("SELECT m_id FROM game WHERE g_id = %s", (gameId,))
 				theMessage = cur.fetchall()[0][0]
-				bot.send_message(chat_id=query.message.chat_id, reply_to_message_id=theMessage, text="Sorry "+(" " if theUser.first_name == None else theUser.first_name)+" "+("" if theUser.last_name == None else theUser.last_name)+", but you are not Admin of this game!")
+				context.bot.send_message(chat_id=query.message.chat_id, reply_to_message_id=theMessage, text="Sorry "+(" " if theUser.first_name == None else theUser.first_name)+" "+("" if theUser.last_name == None else theUser.last_name)+", but you are not Admin of this game!")
 
 		elif query.data == '3':
 			if adminId == theUser.id:
@@ -248,34 +248,34 @@ def buttonHandler(bot, update):
 	                	cur = db.tquery("DELETE FROM game WHERE g_id = %s", (gameId,))
 	                	db.commit()
 
-				bot.edit_message_text(chat_id=query.message.chat_id, text=theMessage, message_id=query.message.message_id)
+				context.bot.edit_message_text(chat_id=query.message.chat_id, text=theMessage, message_id=query.message.message_id)
 			else:
 				cur = db.tquery("SELECT m_id FROM game WHERE g_id = %s", (gameId,))
         	                theMessage = cur.fetchall()[0][0]
-        	                bot.send_message(chat_id=query.message.chat_id, reply_to_message_id=theMessage, text="Sorry "+(" " if theUser.first_name == None else theUser.first_name)+("" if theUser.last_name == None else theUser.last_name)+", but you are not Admin of this game!")
+        	                context.bot.send_message(chat_id=query.message.chat_id, reply_to_message_id=theMessage, text="Sorry "+(" " if theUser.first_name == None else theUser.first_name)+("" if theUser.last_name == None else theUser.last_name)+", but you are not Admin of this game!")
 
-def initgame(bot, update, gName):
+def initgame(update, context, gName):
        	cur = db.tquery("INSERT INTO game (g_id, c_id, m_id, name, admin) VALUES (NULL, %s, %s, %s, %s)", (update.message.chat_id, update.message.message_id+1, gName, update.message.from_user.id))
         db.commit()
         bot.send_message(chat_id=update.message.chat_id, text=gName+"\nstatus: waiting for players!\nadmin: "+("" if update.message.from_user.first_name == None else update.message.from_user.first_name)+" "+("" if update.message.from_user.last_name == None else update.message.from_user.last_name)+"\n|\nmembers:\n", reply_markup=inlineKey())
 
-def reply(bot, update):
+def reply(update, context):
 	if update.message.chat_id in gcreate:
-		initgame(bot, update, update.message.text)
+		initgame(update, context, update.message.text)
 		gcreate.remove(update.message.chat_id)
 
 	if update.message.chat_id in feed:
-		bot.send_message(chat_id=update.message.chat_id, text="Thank you for your feedback, I appreciate your time and thank you for using the bot.")
+		context.bot.send_message(chat_id=update.message.chat_id, text="Thank you for your feedback, I appreciate your time and thank you for using the bot.")
 		feed.remove(update.message.chat_id)
 
 	if update.message.chat_id in bug:
-		bot.send_message(chat_id=update.message.chat_id, text="Thank you for reporting the bug, I will try to fix this as soon as possible.")
+		context.bot.send_message(chat_id=update.message.chat_id, text="Thank you for reporting the bug, I will try to fix this as soon as possible.")
 		bug.remove(update.message.chat_id)
 
-def gamerules(bot, update):
-	bot.send_message(chat_id=update.message.chat_id, text="Rules:\nFirstly add me to a group.\nSecondly type in '/creategame [gamename]'.\nThirdly all users that want to play with you have to start a privat chat with me, then click the 'Join' button.\nAt the End the user who created the game (the admin) has to click 'Start'.\n\nOnce the game is started, each user gets a privat message from me with the randomly chosen player, the user has to get a gift for.")
+def gamerules(update, context):
+	context.bot.send_message(chat_id=update.message.chat_id, text="Rules:\nFirstly add me to a group.\nSecondly type in '/creategame [gamename]'.\nThirdly all users that want to play with you have to start a privat chat with me, then click the 'Join' button.\nAt the End the user who created the game (the admin) has to click 'Start'.\n\nOnce the game is started, each user gets a privat message from me with the randomly chosen player, the user has to get a gift for.")
 
-def help(bot, update):
+def help(update, context):
 	update.message.reply_text("Commandlist:\n/start - for starting a conversation with MCSecretSantaBot\n/gamerules - for displaying the rules of the game\n/creategame [game name] - for creating a new game\n/help - for this help message\n/feedback - for improving the bot experience\n/bugreport - for reporting bugs")
 
 def feedback(update, context):
