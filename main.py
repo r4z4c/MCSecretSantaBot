@@ -179,7 +179,14 @@ def buttonHandler(update, context):
 			cur = db.tquery("SELECT u_id, first_name, last_name FROM user WHERE u_id = (SELECT u_id FROM game_user WHERE g_id = %s)", (gameId,))
 			gameUser = cur.fetchall()
 			print gameUser
-			if theUser.id in gameUser:
+			userID = []
+			userName = []
+			for i in range(len(gameUser)):
+				userID.append(gameUser[i][0])
+				userID.append(gameUser[i][1]+" "+gameUser[i][2])
+			print userID
+
+			if theUser.id in userID:
 				sql = "DELETE FROM game_user WHERE g_id = %s AND u_id = %s"
 				tuple = (gameId, theUser.id)
 				cur = db.tquery(sql, tuple)
