@@ -242,15 +242,15 @@ def buttonHandler(update, context):
 			context.bot.edit_message_text(chat_id=query.message.chat_id, text=theMessage, message_id=query.message.message_id)
 
 def initgame(update, context, gName):
-	message = "game: "#+str(gName)+"\nstatus: waiting for players!\nadmin: "+("" if update.message.from_user.first_name == None else str(update.message.from_user.first_name))+" "+("" if update.message.from_user.last_name == None else str(update.message.from_user.last_name)+"\n\nmembers:\n")
-	cur = db.tquery("INSERT INTO game (g_id, u_id, m_id, name, message) VALUES (NULL, %s, %s, %s)", (update.message.chat_id, update.message.message_id+1, gName, message))
+	message = "game: "+str(gName)+"\nstatus: waiting for players!\nadmin: "+("" if update.message.from_user.first_name == None else str(update.message.from_user.first_name))+" "+("" if update.message.from_user.last_name == None else str(update.message.from_user.last_name)+"\n\nmembers:\n")
+	cur = db.tquery("INSERT INTO game (g_id, u_id, m_id, name, message) VALUES (NULL, %s, %s, %s, %s)", (update.message.chat_id, update.message.message_id+1, gName, message))
 	db.commit()
 	context.bot.send_message(chat_id=update.message.chat_id, text=message, reply_markup=adminKey())
 
 def joingame(update, context, gName):
 	cur = db.tquery("SELECT message FROM game WHERE name = %s)", (gName,))
 	message = cur.fetchall()[0][0]
-	cur = db.tquery("INSERT INTO game (g_id, u_id, m_id, name, message) VALUES (NULL, %s, %s, %s)", (update.message.chat_id, update.message.message_id+1, gName, message))
+	cur = db.tquery("INSERT INTO game (g_id, u_id, m_id, name, message) VALUES (NULL, %s, %s, %s, %s)", (update.message.chat_id, update.message.message_id+1, gName, message))
 	db.commit()
 	context.bot.send_message(chat_id=update.message.chat_id, text=message, reply_markup=adminKey())
 
