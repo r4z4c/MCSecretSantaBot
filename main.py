@@ -142,11 +142,11 @@ def start(update, context):
 		context.bot.send_message(chat_id=update.message.chat_id, text="I'm sorry, this only works in privat chat with me!")
 
 
-def creategame(update, context, args):
+def creategame(update, context):
 	if checkData(update, context, update.message, save=False):
 		gName = ""
 		try:
-			gName = args[0]
+			gName = context.args[0]
 		except:
 			pass
 
@@ -156,8 +156,7 @@ def creategame(update, context, args):
 			if not gName == "":
 				initgame(bot, update, gName)
 			else:
-				reply_markup = ForceReply(selective=True)
-				context.bot.send_message(chat_id=update.message.chat_id, reply_to_message_id=update.message.message_id, text="Type in the game name", reply_markup=reply_markup)
+				context.bot.send_message(chat_id=update.message.chat_id, reply_to_message_id=update.message.message_id, text="Type in the game name")
        				gcreate.append(update.message.chat_id)
 
 def buttonHandler(update, context):
@@ -279,13 +278,11 @@ def help(update, context):
 	update.message.reply_text("Commandlist:\n/start - for starting a conversation with MCSecretSantaBot\n/gamerules - for displaying the rules of the game\n/creategame [game name] - for creating a new game\n/help - for this help message\n/feedback - for improving the bot experience\n/bugreport - for reporting bugs")
 
 def feedback(update, context):
-	reply_markup = ForceReply(selective=True)
-	context.bot.send_message(chat_id=update.message.chat_id, text="Please type in the Feedback", reply_markup=reply_markup)
+	context.bot.send_message(chat_id=update.message.chat_id, text="Please type in the Feedback")
 	feed.append(update.message.chat_id)
 
 def bugreport(update, context):
-	reply_markup = ForceReply(selective=True)
-	context.bot.send_message(chat_id=update.message.chat_id, text="Please type in the Bugreport", reply_markup=reply_markup)
+	context.bot.send_message(chat_id=update.message.chat_id, text="Please type in the Bugreport")
 	bug.append(update.message.chat_id)
 
 def error(update, context):
