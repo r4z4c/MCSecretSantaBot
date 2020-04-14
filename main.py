@@ -176,26 +176,23 @@ def buttonHandler(update, context):
 
 		if query.data == '1':
 			isMember = True
-			cur = db.tquery("SELECT u_id FROM game_user WHERE g_id = %s", (gameId,))
+			cur = db.tquery("SELECT u_id, first_name, last_name FROM user WHERE u_id = (SELECT u_id FROM game_user WHERE g_id = %s)", (gameId,))
 			gameUser = cur.fetchall()
 			print gameUser
-			for i in range(0, len(theMessage)):
-				if theMessage[i:i+len(theUser.first_name)+2] == "- "+theUser.first_name:
-					theMessage = theMessage[0:i-1]+theMessage[i+len(theUser.first_name)+3:len(theMessage)]
-					sql = "DELETE FROM game_user WHERE g_id = %s AND u_id = %s"
-					tuple = (gameId, theUser.id)
-					cur = db.tquery(sql, tuple)
-					db.commit()
-					context.bot.edit_message_text(text=theMessage, chat_id=query.message.chat_id, message_id=query.message.message_id, reply_markup=reply_markup)
-					isMember = False
-					break
+			if theUser.user_id in gameUser
+				sql = "DELETE FROM game_user WHERE g_id = %s AND u_id = %s"
+				tuple = (gameId, theUser.id)
+				cur = db.tquery(sql, tuple)
+				db.commit()
+				context.bot.edit_message_text(text=message, chat_id=query.message.chat_id, message_id=query.message.message_id, reply_markup=reply_markup)
+				isMember = False
 
-			if isMember:
+			else:
 				sql = "INSERT INTO game_user (gu_id, g_id, u_id) VALUES (NULL, %s, %s)"
 				tuple = (gameId, theUser.id)
 				cur = db.tquery(sql, tuple)
 				db.commit()
-				context.bot.edit_message_text(text=theMessage+"\n - "+theUser.first_name, chat_id=query.message.chat_id, message_id=query.message.message_id, reply_markup=reply_markup)
+				context.bot.edit_message_text(text=message+"\n - "+theUser.first_name, chat_id=query.message.chat_id, message_id=query.message.message_id, reply_markup=reply_markup)
 
 		elif query.data == '2':
 			cur = db.tquery("SELECT u_id FROM game_user WHERE g_id = %s", (gameId,))
