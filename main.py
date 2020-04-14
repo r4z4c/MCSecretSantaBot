@@ -176,8 +176,8 @@ def buttonHandler(update, context):
 
 		if query.data == '1':
 			isMember = True
-			if theUser.first_name in theMessage:
-				print "Ist da"
+			a = theMessage.split("- ")
+			print a
 			for i in range(0, len(theMessage)):
 				if theMessage[i:i+len(theUser.first_name)+2] == "- "+theUser.first_name:
 					theMessage = theMessage[0:i-1]+theMessage[i+len(theUser.first_name)+3:len(theMessage)]
