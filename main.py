@@ -89,6 +89,14 @@ def checkUser(update, context, message):
 
 	return True
 
+def checkReply(update):
+	if update.message.chat_id in gcreate:
+		gcreate.remove(update.message.chat_id)
+	if update.message.chat_id in feed:
+		feed.remove(update.message.chat_id)
+	if update.message.chat_id in bug:
+		bug.remove(update.message.chat_id)
+
 def rtd(context, gameUser, theGame):
 	tmpUser = copy.deepcopy(gameUser)
 	randa = []
@@ -112,7 +120,7 @@ def adminKey():
 def start(update, context):
 	if update.message.chat.type == "private":
 		checkUser(update, context, update.message)
-		context.bot.send_message(chat_id=update.message.chat_id, text="Welcome to MCSecretSantaBot type /help for more info's")
+		context.bot.send_message(chat_id=update.message.chat_id, text="Welcome to MCSecretSantaBot type /help for more information")
 	else:
 		context.bot.send_message(chat_id=update.message.chat_id, text="I'm sorry, this only works in private chat with me!")
 
@@ -129,6 +137,7 @@ def creategame(update, context):
 			initgame(update, context, gName)
 		else:
 			context.bot.send_message(chat_id=update.message.chat_id, reply_to_message_id=update.message.message_id, text="Type in the game name")
+			checkReply(update)
 			gcreate.append(update.message.chat_id)
 
 def buttonHandler(update, context):
@@ -238,10 +247,12 @@ def help(update, context):
 
 def feedback(update, context):
 	context.bot.send_message(chat_id=update.message.chat_id, text="Please type in the Feedback")
+	checkReply(update)
 	feed.append(update.message.chat_id)
 
 def bugreport(update, context):
 	context.bot.send_message(chat_id=update.message.chat_id, text="Please type in the Bugreport")
+	checkReply(update)
 	bug.append(update.message.chat_id)
 
 def error(update, context):
