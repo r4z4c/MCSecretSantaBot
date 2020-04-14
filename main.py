@@ -77,7 +77,7 @@ class FilterReply(BaseFilter):
 	def filter(self, message):
 		return bool(len(gcreate)+len(feed)+len(bug))
 
-def editGame(context, gameID):
+def updateMessage(context, gameID):
 	cur = db.tquery("SELECT message FROM game WHERE g_id = %s", (gameID,))
 	message = str(cur.fetchall()[0])
 	cur = db.tquery("SELECT u.first_name, u.last_name, u.u_id, gu.admin, gu.m_id FROM user AS u, game_user AS gu WHERE gu.u_id = u.u_id AND u.u_id = (SELECT u_id FROM game_user WHERE g_id = %s)", (gameID,))
@@ -141,6 +141,9 @@ def adminKey():
 	keyboard = [[InlineKeyboardButton("Join/Exit", callback_data='1')],[InlineKeyboardButton("Start", callback_data='2'), InlineKeyboardButton("Abort", callback_data='3')]]
 	return InlineKeyboardMarkup(keyboard)
 
+def userKey():
+	keyboard = [InlineKeyboardButton("Exit", callback_data='4')]
+	return InlineKeyboardMarkup(keyboard)
 
 def start(update, context):
 	if update.message.chat.type == "private":
@@ -211,14 +214,14 @@ def buttonHandler(update, context):
 				tuple = (gameId, theUser.id)
 				cur = db.tquery(sql, tuple)
 				db.commit()
-				editGame(context, gameId)
+				updateMessage(context, gameId)
 
 			else:
 				sql = "INSERT INTO game_user (gu_id, admin, g_id, u_id) VALUES (NULL, 1, %s, %s)"
 				tuple = (gameId, theUser.id)
 				cur = db.tquery(sql, tuple)
 				db.commit()
-				editGame(context, gameId)
+				updateMessage(context, gameId)
 
 		elif query.data == '2':
 			cur = db.tquery("SELECT u_id FROM game_user WHERE g_id = %s", (gameId,))
