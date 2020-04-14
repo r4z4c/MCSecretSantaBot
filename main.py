@@ -127,7 +127,7 @@ def rtd(context, theChat, theGame):
 	for t in range(0, len(theUser)):
 		context.bot.send_message(chat_id=theChat[t], text="Hey "+ theUser[t]+", the Player I chose for you, in the game '"+theGame+"' , is "+tmpUser[t])
 
-def inlineKey():
+def adminKey():
 	keyboard = [[InlineKeyboardButton("Join/Exit", callback_data='1')],[InlineKeyboardButton("Start", callback_data='2'), InlineKeyboardButton("Abort", callback_data='3')]]
 	return InlineKeyboardMarkup(keyboard)
 
@@ -160,7 +160,7 @@ def buttonHandler(update, context):
 	query = update.callback_query
 
 	if checkData(query, context, query, save=False):
-		reply_markup = inlineKey()
+		reply_markup = adminKey()
 
 		theUser = query.from_user
 		theMessage = query.message.text
@@ -253,7 +253,7 @@ def buttonHandler(update, context):
 def initgame(update, context, gName):
 	cur = db.tquery("INSERT INTO game (g_id, c_id, m_id, name, admin) VALUES (NULL, %s, %s, %s, %s)", (update.message.chat_id, update.message.message_id+1, gName, update.message.from_user.id))
 	db.commit()
-	context.bot.send_message(chat_id=update.message.chat_id, text=gName+"\nstatus: waiting for players!\nadmin: "+("" if update.message.from_user.first_name == None else update.message.from_user.first_name)+" "+("" if update.message.from_user.last_name == None else update.message.from_user.last_name)+"\n|\nmembers:\n", reply_markup=inlineKey())
+	context.bot.send_message(chat_id=update.message.chat_id, text="game: "+gName+"\nstatus: waiting for players!\nadmin: "+("" if update.message.from_user.first_name == None else update.message.from_user.first_name)+" "+("" if update.message.from_user.last_name == None else update.message.from_user.last_name)+"\n|\nmembers:\n", reply_markup=adminKey())
 
 def reply(update, context):
 	if update.message.chat_id in gcreate:
