@@ -54,12 +54,15 @@ class DB:
 
 db = DB()
 
-sql = "SELECT * FROM user"
-cur = db.squery(sql)
+DEBUG = False
 
-# print the first and second column
-for row in cur.fetchall() :
-	print row[0], " ", row[1]
+if DEBUG == True:
+	sql = "SELECT * FROM user"
+	cur = db.squery(sql)
+
+	# print the first and second column
+	for row in cur.fetchall() :
+		print row[0], " ", row[1]
 
 #variables
 gcreate = []
@@ -108,8 +111,8 @@ def adminKey():
 
 def start(update, context):
 	if update.message.chat.type == "private":
-		if not checkUser(update, context, update.message):
-			context.bot.send_message(chat_id=update.message.chat_id, text="Welcome to MCSecretSantaBot type /help for more info's")
+		checkUser(update, context, update.message):
+		context.bot.send_message(chat_id=update.message.chat_id, text="Welcome to MCSecretSantaBot type /help for more info's")
 	else:
 		context.bot.send_message(chat_id=update.message.chat_id, text="I'm sorry, this only works in private chat with me!")
 
