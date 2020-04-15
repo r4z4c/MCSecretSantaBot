@@ -103,10 +103,9 @@ def updateMessage(context, gameID):
 	
 	for i in range(len(userID)):
 		if userID is not gameID:
-			print "\n"
-			print str(userID[i])
-			print str(messageID[i])
-			print "\n"
+			print ""
+			print type(messageID[i])
+			print ""
 			reply_markup = userKey()
 			context.bot.edit_message_text(text=message, chat_id=userID[i], message_id=messageID[i], reply_markup=reply_markup)
 
@@ -190,6 +189,10 @@ def join(update, context):
 
 def buttonHandler(update, context):
 	query = update.callback_query
+
+	print ""
+	print type(query.message.message_id)
+	print ""
 
 	if checkUser(query, context, query):
 		reply_markup = adminKey()
