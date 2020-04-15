@@ -96,21 +96,15 @@ def updateMessage(context, gameID):
 	userID = []
 	messageID = []
 	for i in tmpUser:
-		print i
 		message += ("\n- "+str(i[0])+" "+str(i[1]))
 		userID.append(i[2])
 		messageID.append(i[3])
 	
 	for i in range(len(userID)):
-		print userID[i]
-		print gameID
 		if userID[i] != guID:
-			print "true"
 			reply_markup = userKey()
 			context.bot.edit_message_text(text=message, chat_id=int(userID[i]), message_id=int(messageID[i]), reply_markup=reply_markup)
 
-	print guID
-	print gmID
 	reply_markup = adminKey()
 	context.bot.edit_message_text(text=message, chat_id=guID, message_id=gmID, reply_markup=reply_markup)
 
@@ -179,7 +173,7 @@ def initgame(update, context, gName):
 	context.bot.send_message(chat_id=update.message.chat_id, text=message, reply_markup=adminKey())
 
 def joingame(update, context, gName):
-	cur = db.squery("SELECT u_id FROM user")
+	cur = db.squery("SELECT u_id FROM user WHERE u_id = (SELECT u_id FROM game_user)")
 	gameUser = cur.fetchall()
 	userID = []
 
