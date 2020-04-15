@@ -84,7 +84,7 @@ def updateMessage(context, gameID):
 	gmID = game[0][1]
 	cur = db.tquery("SELECT u.first_name, u.last_name, u.u_id, gu.m_id FROM user AS u, game_user AS gu WHERE gu.u_id = u.u_id AND gu.g_id = %s", (gameID,))
 	tmpUser = cur.fetchall()
-	userId = []
+	userID = []
 	messageID = []
 	print tmpUser
 	for i in tmpUser:
@@ -205,9 +205,6 @@ def buttonHandler(update, context):
 
 			for i in range(0, len(gameUser)):
 				userID.append(gameUser[i][0])
-
-			print userID
-			print theUser.id
 
 			if theUser.id in userID:
 				cur = db.tquery("DELETE FROM game_user WHERE g_id = %s AND u_id = %s", (gameId, theUser.id))
