@@ -173,12 +173,12 @@ def initgame(update, context, gName):
 	context.bot.send_message(chat_id=update.message.chat_id, text=message, reply_markup=adminKey())
 
 def joingame(update, context, gName):
-	cur = db.tquery("SELECT g_id FROM game WHERE name = %s)", (gName,))
+	cur = db.tquery("SELECT g_id FROM game WHERE name = %s", (gName,))
 	gameID = cur.fetchall()[0]
 	cur = db.tquery("SELECT u_id FROM user WHERE u_id = (SELECT u_id FROM game_user WHERE g_id = %s)", (gameID,))
 	gameUser = cur.fetchall()
 	userID = []
-	print gameID
+	print gameUser
 
 	for i in range(0, len(gameUser)):
 		userID.append(gameUser[i][0])
