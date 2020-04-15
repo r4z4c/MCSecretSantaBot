@@ -107,7 +107,7 @@ def updateMessage(context, gameID):
 			print type(messageID[i])
 			print ""
 			reply_markup = userKey()
-			context.bot.edit_message_text(text=message, chat_id=userID[i], message_id=messageID[i], reply_markup=reply_markup)
+			context.bot.edit_message_text(text=message, chat_id=int(userID[i]), message_id=int(messageID[i]), reply_markup=reply_markup)
 
 	reply_markup = adminKey()
 	context.bot.edit_message_text(text=message, chat_id=guID, message_id=gmID, reply_markup=reply_markup)
