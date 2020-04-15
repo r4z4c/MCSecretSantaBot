@@ -77,11 +77,20 @@ class FilterReply(BaseFilter):
 	def filter(self, message):
 		return bool(len(gcreate)+len(feed)+len(bug))
 
+def adminKey():
+	keyboard = [[InlineKeyboardButton("Join/Exit", callback_data='1')],[InlineKeyboardButton("Start", callback_data='2'), InlineKeyboardButton("Abort", callback_data='3')]]
+	return InlineKeyboardMarkup(keyboard)
+
+def userKey():
+	keyboard = [InlineKeyboardButton("Exit", callback_data='4')]
+	return InlineKeyboardMarkup(keyboard)
+
 def updateMessage(context, gameID):
-	cur = db.tquery("SELECT message, u_id FROM game WHERE g_id = %s", (gameID,))
+	cur = db.tquery("SELECT message, u_id, m_id FROM game WHERE g_id = %s", (gameID,))
 	game = cur.fetchall()
 	message = game[0][0]
-	gmID = game[0][1]
+	guID = game[0][1]
+	gmID = game[0][2]
 	cur = db.tquery("SELECT u.first_name, u.last_name, u.u_id, gu.m_id FROM user AS u, game_user AS gu WHERE gu.u_id = u.u_id AND gu.g_id = %s", (gameID,))
 	tmpUser = cur.fetchall()
 	userID = []
@@ -93,11 +102,12 @@ def updateMessage(context, gameID):
 		messageID.append(tmpUser[0][3])
 
 	for i in userID:
-		reply_markup = userKey()
-		if userID == admin:
-			reply_markup = adminKey()
+		if userID not gameID:
+			reply_markup = userKey()
+			context.bot.edit_message_text(text=message, chat_id=userID[i], message_id=messageID[i], reply_markup=reply_markup)
 
-		context.bot.edit_message_text(text=message, chat_id=userID[i], message_id=messageID[i], reply_markup=reply_markup)
+	reply_markup = adminKey()
+	context.bot.edit_message_text(text=message, chat_id=guID, message_id=gmID, reply_markup=reply_markup)
 
 def checkUser(update, context, message):
 	cur = db.squery("SELECT u_id FROM user")
@@ -136,14 +146,6 @@ def rtd(context, gameUser, theGame):
 
 	for i in range(0, len(gameUser)):
 		context.bot.send_message(chat_id=gameUser[i], text="Hey "+ gameUser[i]+", the Player I chose for you in the game '"+theGame+"' is "+tmpUser[i])
-
-def adminKey():
-	keyboard = [[InlineKeyboardButton("Join/Exit", callback_data='1')],[InlineKeyboardButton("Start", callback_data='2'), InlineKeyboardButton("Abort", callback_data='3')]]
-	return InlineKeyboardMarkup(keyboard)
-
-def userKey():
-	keyboard = [InlineKeyboardButton("Exit", callback_data='4')]
-	return InlineKeyboardMarkup(keyboard)
 
 def start(update, context):
 	if update.message.chat.type == "private":
