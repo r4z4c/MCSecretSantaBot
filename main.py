@@ -165,7 +165,7 @@ def checkGame(update, context, name):
 	gameName = []
 
 	for i in game:
-		gameName.append(game[i][0])
+		gameName.append(i[0])
 
 	if name in gameName:
 		return True
