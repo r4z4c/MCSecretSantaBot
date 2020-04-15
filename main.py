@@ -179,7 +179,7 @@ def initgame(update, context, gName):
 	context.bot.send_message(chat_id=update.message.chat_id, text=message, reply_markup=adminKey())
 
 def joingame(update, context, gName):
-	cur = db.tquery("SELECT u_id FROM user WHERE u_id = (SELECT u_id FROM game_user WHERE g_id = (SELECT g_id FROM game WHERE name = %s))", (gName,))
+	cur = db.squery("SELECT u_id FROM user")
 	gameUser = cur.fetchall()
 	userID = []
 
@@ -224,7 +224,10 @@ def join(update, context):
 		except:
 			pass
 		if not gName == "":
-			joingame(update, context, gName)
+			if checkGame(update, context, update.message.text):
+				joingame(update, context, update.message.text)
+		else:
+			context.bot.send_message(chat_id=update.message.chat_id, reply_to_message_id=update.message.message_id, text="A game with this name does not exist!\nPlease type in a existing gamename.")
 		else:
 			context.bot.send_message(chat_id=update.message.chat_id, reply_to_message_id=update.message.message_id, text="Type in the game name")
 			checkReply(update)
