@@ -159,12 +159,15 @@ def start(update, context):
 	else:
 		context.bot.send_message(chat_id=update.message.chat_id, text="I'm sorry, this only works in private chat with me!")
 
-def checkGame(update, context, gName):
+def checkGame(update, context, name):
 	cur = db.squery("SELECT name FROM game")
 	game = cur.fetchall()
-	print game
+	gameName = []
 
-	if gName in game:
+	for i in game:
+		gameName.append(game[i][0])
+
+	if name in gameName:
 		return True
 	else:
 		return False
