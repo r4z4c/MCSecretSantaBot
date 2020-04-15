@@ -162,6 +162,7 @@ def start(update, context):
 def checkGame(update, context, gName):
 	cur = db.squery("SELECT name FROM game")
 	game = cur.fetchall()
+	print game
 
 	if gName in game:
 		return True
@@ -175,7 +176,7 @@ def initgame(update, context, gName):
 	context.bot.send_message(chat_id=update.message.chat_id, text=message, reply_markup=adminKey())
 
 def joingame(update, context, gName):
-	cur = db.tquery("SELECT u_id FROM user WHERE u_id = (SELECT u_id FROM game_user WHERE g_id = (SELECT g_id FROM game WHERE name = %s))", (gName,))
+	cur = db.tquery("SELECT u_id FROM user WHERE u_id = (SELECT u_id FROM game_user WHERE g_id = (SELECT g_id FROM game WHERE name = %s)))", (gName,))
 	gameUser = cur.fetchall()
 	userID = []
 
@@ -185,9 +186,12 @@ def joingame(update, context, gName):
 	if update.message.from_user.id in userID:
 		context.bot.send_message(chat_id=update.message.chat_id, text="You are already in the game!")
 	else:
-		cur = db.tquery("INSERT INTO game_user (gu_id, g_id, u_id, m_id) VALUES (NULL, %s, %s, %s)", (gameId, theUser.id, query.message.message_id))
+		cur = db.tquery("SELECT g_id FROM game WHERE name = %s)", (gName,))
+		gameID = cur.fetchall()[0]
+
+		cur = db.tquery("INSERT INTO game_user (gu_id, g_id, u_id, m_id) VALUES (NULL, %s, %s, %s)", (gameID, update.message.from_user.id, update.message.message_id+1))
 		db.commit()
-		updateMessage(context, gameId)
+		updateMessage(context, gameID)
 
 def creategame(update, context):
 	if checkUser(update, context, update.message):
