@@ -75,7 +75,7 @@ bug = []
 
 class FilterReply(BaseFilter):
 	def filter(self, message):
-		return bool(len(gcreate)+len(feed)+len(bug))
+		return bool(len(gcreate)+len(gjoin)+len(feed)+len(bug))
 
 def adminKey():
 	keyboard = [[InlineKeyboardButton("Join/Exit", callback_data='1')],[InlineKeyboardButton("Start", callback_data='2'), InlineKeyboardButton("Abort", callback_data='3')]]
@@ -179,7 +179,7 @@ def initgame(update, context, gName):
 	context.bot.send_message(chat_id=update.message.chat_id, text=message, reply_markup=adminKey())
 
 def joingame(update, context, gName):
-	cur = db.tquery("SELECT u_id FROM user WHERE u_id = (SELECT u_id FROM game_user WHERE g_id = (SELECT g_id FROM game WHERE name = %s)))", (gName,))
+	cur = db.tquery("SELECT u_id FROM user WHERE u_id = (SELECT u_id FROM game_user WHERE g_id = (SELECT g_id FROM game WHERE name = %s))", (gName,))
 	gameUser = cur.fetchall()
 	userID = []
 
