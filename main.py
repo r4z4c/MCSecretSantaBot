@@ -193,7 +193,6 @@ def buttonHandler(update, context):
 
 		cur = db.tquery("SELECT g_id, m_id, name, message FROM game WHERE u_id = %s AND m_id = %s", (query.message.chat_id, query.message.message_id))
 		game = cur.fetchall()
-		print game
 		gameId = game[0][0]
 		gmID = game[0][1]
 		theGame = game[0][2]
@@ -203,6 +202,8 @@ def buttonHandler(update, context):
 			cur = db.tquery("SELECT u_id FROM user WHERE u_id = (SELECT u_id FROM game_user WHERE g_id = %s)", (gameId,))
 			gameUser = cur.fetchall()
 			userID = []
+			print gameUser
+			print len(gameUser)
 			for i in range(0, len(gameUser)):
 				userID.append(gameUser[i])
 
