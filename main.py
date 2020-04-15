@@ -97,9 +97,9 @@ def updateMessage(context, gameID):
 	messageID = []
 	print tmpUser
 	for i in tmpUser:
-		message += ("\n- "+tmpUser[0][0]+" "+tmpUser[0][1])
-		userID.append(tmpUser[0][2])
-		messageID.append(tmpUser[0][3])
+		message += ("\n- "+tmpUser[0]+" "+tmpUser[1])
+		userID.append(tmpUser[2])
+		messageID.append(tmpUser[3])
 
 	for i in userID:
 		if userID != gameID:
