@@ -212,7 +212,7 @@ def buttonHandler(update, context):
 				db.commit()
 				updateMessage(context, gameId)
 			else:
-				cur = db.tquery("INSERT INTO game_user (gu_id, g_id, u_id, m_id) VALUES (NULL, %s, %s)", (gameId, theUser.id, query.message.message_id))
+				cur = db.tquery("INSERT INTO game_user (gu_id, g_id, u_id, m_id) VALUES (NULL, %s, %s, %s)", (gameId, theUser.id, query.message.message_id))
 				db.commit()
 				updateMessage(context, gameId)
 
