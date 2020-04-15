@@ -226,8 +226,8 @@ def join(update, context):
 		if not gName == "":
 			if checkGame(update, context, update.message.text):
 				joingame(update, context, update.message.text)
-		else:
-			context.bot.send_message(chat_id=update.message.chat_id, reply_to_message_id=update.message.message_id, text="A game with this name does not exist!\nPlease type in a existing gamename.")
+			else:
+				context.bot.send_message(chat_id=update.message.chat_id, reply_to_message_id=update.message.message_id, text="A game with this name does not exist!\nPlease type in a existing gamename.")
 		else:
 			context.bot.send_message(chat_id=update.message.chat_id, reply_to_message_id=update.message.message_id, text="Type in the game name")
 			checkReply(update)
