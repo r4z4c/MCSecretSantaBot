@@ -175,14 +175,14 @@ def initgame(update, context, gName):
 	context.bot.send_message(chat_id=update.message.chat_id, text=message, reply_markup=adminKey())
 
 def joingame(update, context, gName):
-	cur = db.tquery("SELECT u_id FROM user WHERE u_id = (SELECT u_id FROM game_user WHERE g_id = %s)", (gameId,))
+	cur = db.tquery("SELECT u_id FROM user WHERE u_id = (SELECT u_id FROM game_user WHERE f_id = (SELECT g_id FROM game WHERE name = %s))", (gName,))
 	gameUser = cur.fetchall()
 	userID = []
 
 	for i in range(0, len(gameUser)):
 		userID.append(gameUser[i][0])
 
-	if theUser.id in userID:
+	if update.message.from_user.id in userID:
 		context.bot.send_message(chat_id=update.message.chat_id, text="You are already in the game!")
 	else:
 		cur = db.tquery("INSERT INTO game_user (gu_id, g_id, u_id, m_id) VALUES (NULL, %s, %s, %s)", (gameId, theUser.id, query.message.message_id))
