@@ -100,14 +100,13 @@ def updateMessage(context, gameID):
 		message += ("\n- "+str(i[0])+" "+str(i[1]))
 		userID.append(i[2])
 		messageID.append(i[3])
-
-	print tmpUser
-	print userID
 	
 	for i in range(len(userID)):
 		if userID is not gameID:
-			print "true"
-			print i
+			print "\n"
+			print str(userID[i])
+			print str(messageID[i])
+			print "\n"
 			reply_markup = userKey()
 			context.bot.edit_message_text(text=message, chat_id=userID[i], message_id=messageID[i], reply_markup=reply_markup)
 
