@@ -104,7 +104,7 @@ def updateMessage(context, gameID):
 	for i in range(len(userID)):
 		print userID[i]
 		print gameID
-		if userID[i] != gameID:
+		if userID[i] != guID:
 			print "true"
 			reply_markup = userKey()
 			context.bot.edit_message_text(text=message, chat_id=int(userID[i]), message_id=int(messageID[i]), reply_markup=reply_markup)
