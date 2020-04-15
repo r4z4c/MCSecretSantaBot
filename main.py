@@ -159,6 +159,35 @@ def start(update, context):
 	else:
 		context.bot.send_message(chat_id=update.message.chat_id, text="I'm sorry, this only works in private chat with me!")
 
+def checkGame(update, context, gName):
+	cur = db.squery("SELECT name FROM game")
+	game = cur.fetchall()
+
+	if gName in game:
+		return True
+	else:
+		return False
+
+def initgame(update, context, gName):
+	message = "game: "+str(gName)+"\nstatus: waiting for players!\nadmin: "+("" if update.message.from_user.first_name == None else str(update.message.from_user.first_name))+" "+("" if update.message.from_user.last_name == None else str(update.message.from_user.last_name)+"\n\nmembers:\n")
+	cur = db.tquery("INSERT INTO game (g_id, u_id, m_id, name, message) VALUES (NULL, %s, %s, %s, %s)", (update.message.chat_id, update.message.message_id+1, gName, message))
+	db.commit()
+	context.bot.send_message(chat_id=update.message.chat_id, text=message, reply_markup=adminKey())
+
+def joingame(update, context, gName):
+	cur = db.tquery("SELECT u_id FROM user WHERE u_id = (SELECT u_id FROM game_user WHERE g_id = %s)", (gameId,))
+	gameUser = cur.fetchall()
+	userID = []
+
+	for i in range(0, len(gameUser)):
+		userID.append(gameUser[i][0])
+
+	if theUser.id in userID:
+		context.bot.send_message(chat_id=update.message.chat_id, text="You are already in the game!")
+	else:
+		cur = db.tquery("INSERT INTO game_user (gu_id, g_id, u_id, m_id) VALUES (NULL, %s, %s, %s)", (gameId, theUser.id, query.message.message_id))
+		db.commit()
+		updateMessage(context, gameId)
 
 def creategame(update, context):
 	if checkUser(update, context, update.message):
@@ -169,7 +198,12 @@ def creategame(update, context):
 			pass
 
 		if not gName == "":
-			initgame(update, context, gName)
+			if not checkGame(update, context, gName):
+				initgame(update, context, gName)
+			else:
+				context.bot.send_message(chat_id=update.message.chat_id, reply_to_message_id=update.message.message_id, text="A game with this name is already running!\nPlease type in a different name.")
+				checkReply(update)
+				gcreate.append(update.message.chat_id)
 		else:
 			context.bot.send_message(chat_id=update.message.chat_id, reply_to_message_id=update.message.message_id, text="Type in the game name")
 			checkReply(update)
@@ -183,7 +217,7 @@ def join(update, context):
 		except:
 			pass
 		if not gName == "":
-			pass
+			joingame(update, context, gName)
 		else:
 			context.bot.send_message(chat_id=update.message.chat_id, reply_to_message_id=update.message.message_id, text="Type in the game name")
 			checkReply(update)
@@ -267,25 +301,10 @@ def buttonHandler(update, context):
 
 			context.bot.edit_message_text(chat_id=query.message.chat_id, text=theMessage, message_id=query.message.message_id)
 
-def initgame(update, context, gName):
-	message = "game: "+str(gName)+"\nstatus: waiting for players!\nadmin: "+("" if update.message.from_user.first_name == None else str(update.message.from_user.first_name))+" "+("" if update.message.from_user.last_name == None else str(update.message.from_user.last_name)+"\n\nmembers:\n")
-	cur = db.tquery("INSERT INTO game (g_id, u_id, m_id, name, message) VALUES (NULL, %s, %s, %s, %s)", (update.message.chat_id, update.message.message_id+1, gName, message))
-	db.commit()
-	context.bot.send_message(chat_id=update.message.chat_id, text=message, reply_markup=adminKey())
-
-def joingame(update, context, gName):
-	cur = db.tquery("SELECT message FROM game WHERE name = %s)", (gName,))
-	message = cur.fetchall()[0][0]
-	cur = db.tquery("INSERT INTO game (g_id, u_id, m_id, name, message) VALUES (NULL, %s, %s, %s, %s)", (update.message.chat_id, update.message.message_id+1, gName, message))
-	db.commit()
-	context.bot.send_message(chat_id=update.message.chat_id, text=message, reply_markup=adminKey())
-
 def reply(update, context):
 	if update.message.chat_id in gcreate:
-		cur = db.squery("SELECT name FROM game")
-		gName = cur.fetchall()
-		if update.message.text in gName:
-			context.bot.send_message(chat_id=update.message.chat_id, text="A game with this name is already running!\nPlease type in a different name.")
+		if checkGame(update, context, update.message.text):
+			context.bot.send_message(chat_id=update.message.chat_id, reply_to_message_id=update.message.message_id, text="A game with this name is already running!\nPlease type in a different name.")
 		else:
 			initgame(update, context, update.message.text)
 			gcreate.remove(update.message.chat_id)
@@ -297,7 +316,7 @@ def reply(update, context):
 			joingame(update, context, update.message.text)
 			gjoin.remove(update.message.chat_id)
 		else:
-			context.bot.send_message(chat_id=update.message.chat_id, text="A game with this name does not exist!\nPlease type in a existing gamename.")
+			context.bot.send_message(chat_id=update.message.chat_id, reply_to_message_id=update.message.message_id, text="A game with this name does not exist!\nPlease type in a existing gamename.")
 
 	if update.message.chat_id in feed:
 		context.bot.send_message(chat_id=update.message.chat_id, text="Thank you for your feedback, I appreciate your time and thank you for using the bot.")
