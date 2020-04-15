@@ -95,9 +95,9 @@ def updateMessage(context, gameID):
 	tmpUser = cur.fetchall()
 	userID = []
 	messageID = []
-	print tmpUser
+	print game
 	for i in tmpUser:
-		message += ("\n- "+tmpUser[0]+" "+tmpUser[1])
+		message += ("\n- "+str(tmpUser[0])+" "+str(tmpUser[1]))
 		userID.append(tmpUser[2])
 		messageID.append(tmpUser[3])
 
