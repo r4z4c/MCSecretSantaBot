@@ -95,16 +95,16 @@ def updateMessage(context, gameID):
 	tmpUser = cur.fetchall()
 	userID = []
 	messageID = []
-	print game
 	for i in tmpUser:
 		message += ("\n- "+str(tmpUser[0])+" "+str(tmpUser[1]))
 		userID.append(tmpUser[2])
 		messageID.append(tmpUser[3])
-
+	print userID
 	for i in range(len(userID)):
 		if userID is not gameID:
 			reply_markup = userKey()
 			context.bot.edit_message_text(text=message, chat_id=userID[i], message_id=messageID[i], reply_markup=reply_markup)
+	print "ok"
 
 	reply_markup = adminKey()
 	context.bot.edit_message_text(text=message, chat_id=guID, message_id=gmID, reply_markup=reply_markup)
