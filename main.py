@@ -194,7 +194,7 @@ def joingame(update, context, gName):
 
 		cur = db.tquery("INSERT INTO game_user (gu_id, g_id, u_id, m_id) VALUES (NULL, %s, %s, %s)", (gameID, update.message.from_user.id, update.message.message_id+1))
 		db.commit()
-		updateMessage(context, gameID)
+		context.bot.send_message(chat_id=update.message.chat_id, text="You are in!", reply_markup=userKey())
 
 def creategame(update, context):
 	if checkUser(update, context, update.message):
