@@ -317,9 +317,7 @@ def reply(update, context):
 			gcreate.remove(update.message.chat_id)
 
 	if update.message.chat_id in gjoin:
-		cur = db.squery("SELECT name FROM game")
-		gName = cur.fetchall()
-		if update.message.text in gName:
+		if not checkGame(update, context, update.message.text):
 			joingame(update, context, update.message.text)
 			gjoin.remove(update.message.chat_id)
 		else:
