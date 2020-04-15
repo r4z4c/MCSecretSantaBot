@@ -204,7 +204,7 @@ def buttonHandler(update, context):
 			userID = []
 
 			for i in range(0, len(gameUser)):
-				userID.append(gameUser[i])
+				userID.append(gameUser[i][0])
 
 			print userID
 			print theUser.id
