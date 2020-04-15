@@ -191,17 +191,19 @@ def buttonHandler(update, context):
 		theUser = query.from_user
 		theMessage = query.message.text
 
-		cur = db.tquery("SELECT g_id, name, message FROM game WHERE u_id = %s AND m_id = %s", (query.message.chat_id, query.message.message_id))
+		cur = db.tquery("SELECT g_id, m_id, name, message FROM game WHERE u_id = %s AND m_id = %s", (query.message.chat_id, query.message.message_id))
 		game = cur.fetchall()
+		print game
 		gameId = game[0][0]
-		theGame = game[0][1]
-		message = game[0][2]
+		gmID = game[0][1]
+		theGame = game[0][2]
+		message = game[0][3]
 
 		if query.data == '1':
 			cur = db.tquery("SELECT u_id FROM user WHERE u_id = (SELECT u_id FROM game_user WHERE g_id = %s)", (gameId,))
 			gameUser = cur.fetchall()
 			userID = []
-			for i in range(len(gameUser)):
+			for i in range(0, len(gameUser)):
 				userID.append(gameUser[i])
 
 			if theUser.id in userID:
@@ -209,7 +211,7 @@ def buttonHandler(update, context):
 				db.commit()
 				updateMessage(context, gameId)
 			else:
-				cur = db.tquery("INSERT INTO game_user (gu_id, g_id, u_id) VALUES (NULL, %s, %s)", (gameId, theUser.id))
+				cur = db.tquery("INSERT INTO game_user (gu_id, g_id, u_id, m_id) VALUES (NULL, %s, %s)", (gameId, theUser.id, query.message.message_id))
 				db.commit()
 				updateMessage(context, gameId)
 
