@@ -96,10 +96,11 @@ def updateMessage(context, gameID):
 	userID = []
 	messageID = []
 	for i in tmpUser:
-		message += ("\n- "+str(tmpUser[0])+" "+str(tmpUser[1]))
-		userID.append(tmpUser[2])
-		messageID.append(tmpUser[3])
-	print userID
+		print i
+		message += ("\n- "+str(i[0])+" "+str(i[1]))
+		userID.append(i[2])
+		messageID.append(i[3])
+	
 	for i in range(len(userID)):
 		if userID is not gameID:
 			reply_markup = userKey()
