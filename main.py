@@ -85,7 +85,7 @@ def userKey():
 	keyboard = [[InlineKeyboardButton("Exit", callback_data='4')]]
 	return InlineKeyboardMarkup(keyboard)
 
-def updateMessage(context, gameID):
+def updateMessage(update, context, gameID):
 	cur = db.tquery("SELECT message, u_id, m_id FROM game WHERE g_id = %s", (gameID,))
 	game = cur.fetchall()
 	message = game[0][0]
@@ -96,7 +96,7 @@ def updateMessage(context, gameID):
 	userID = []
 	messageID = []
 	for i in tmpUser:
-		message += "\n- "+str(i[0])+" "+(str(i[1]) if str(i[1]) not "None")
+		message += (str(update.from_user.username) if str(i[0]) == None else ("\n- "+str(i[0])+" "+("" if str(i[1]) == None else str(i[1]))))
 		userID.append(i[2])
 		messageID.append(i[3])
 	
@@ -109,15 +109,15 @@ def updateMessage(context, gameID):
 	reply_markup = adminKey()
 	context.bot.edit_message_text(text=message, chat_id=guID, message_id=gmID, reply_markup=reply_markup)
 
-def checkUser(update, context, message):
+def checkUser(update, context):
 	cur = db.squery("SELECT u_id FROM user")
 	allUsers = cur.fetchall()
 	theUsers = []
 	for row in allUsers:
 		theUsers.append(int(row[0]))
 
-	if message.from_user.id not in theUsers:
-		cur = db.tquery("INSERT INTO user (u_id, first_name, last_name, username) VALUES (%s, %s, %s, %s)", (message.from_user.id, message.from_user.first_name, message.from_user.last_name, message.from_user.username))
+	if update.message.from_user.id not in theUsers:
+		cur = db.tquery("INSERT INTO user (u_id, first_name, last_name, username) VALUES (%s, %s, %s, %s)", (update.message.from_user.id, update.message.from_user.first_name, update.message.from_user.last_name, update.message.from_user.username))
 		db.commit()
 
 	return True
@@ -149,7 +149,7 @@ def rtd(context, gameUser, theGame):
 
 def start(update, context):
 	if update.message.chat.type == "private":
-		checkUser(update, context, update.message)
+		checkUser(update, context)
 		context.bot.send_message(chat_id=update.message.chat_id, text="Welcome to MCSecretSantaBot type /help for more information")
 	else:
 		context.bot.send_message(chat_id=update.message.chat_id, text="I'm sorry, this only works in private chat with me!")
@@ -189,10 +189,10 @@ def joingame(update, context, gName):
 		cur = db.tquery("INSERT INTO game_user (gu_id, g_id, u_id, m_id) VALUES (NULL, %s, %s, %s)", (gameID, update.message.from_user.id, update.message.message_id+1))
 		db.commit()
 		context.bot.send_message(chat_id=update.message.chat_id, text="You are in!")
-		updateMessage(context, gameID)
+		updateMessage(update, context, gameID)
 
 def creategame(update, context):
-	if checkUser(update, context, update.message):
+	if checkUser(update, context):
 		gName = ""
 		try:
 			gName = context.args[0]
@@ -212,7 +212,7 @@ def creategame(update, context):
 			gcreate.append(update.message.chat_id)
 
 def join(update, context):
-	if checkUser(update, context, update.message):
+	if checkUser(update, context):
 		gName = ""
 		try:
 			gName = context.args[0]
@@ -231,7 +231,7 @@ def join(update, context):
 def buttonHandler(update, context):
 	query = update.callback_query
 
-	if checkUser(query, context, query):
+	if checkUser(query, context):
 		reply_markup = adminKey()
 
 		theUser = query.from_user
@@ -255,11 +255,11 @@ def buttonHandler(update, context):
 			if theUser.id in userID:
 				cur = db.tquery("DELETE FROM game_user WHERE g_id = %s AND u_id = %s", (gameId, theUser.id))
 				db.commit()
-				updateMessage(context, gameId)
+				updateMessage(update, context, gameId)
 			else:
 				cur = db.tquery("INSERT INTO game_user (gu_id, g_id, u_id, m_id) VALUES (NULL, %s, %s, %s)", (gameId, theUser.id, query.message.message_id))
 				db.commit()
-				updateMessage(context, gameId)
+				updateMessage(update, context, gameId)
 
 		elif query.data == '2':
 			cur = db.tquery("SELECT u_id FROM game_user WHERE g_id = %s", (gameId,))
