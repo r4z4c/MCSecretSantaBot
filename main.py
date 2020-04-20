@@ -178,6 +178,7 @@ def joingame(update, context, gName):
 	cur = db.tquery("SELECT u_id FROM user WHERE u_id = (SELECT u_id FROM game_user WHERE g_id = %s)", (gameID,))
 	gameUser = cur.fetchall()
 	userID = []
+	print "Hi"
 
 	for i in range(0, len(gameUser)):
 		userID.append(gameUser[i][0])
