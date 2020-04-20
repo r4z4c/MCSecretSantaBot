@@ -190,7 +190,7 @@ def joingame(update, context, gName):
 			db.commit()
 		except:
 			print "Database update Failed"
-		context.bot.send_message(chat_id=update.message.chat_id, text="You are in!", reply_markup=userKey())
+		#context.bot.send_message(chat_id=update.message.chat_id, text="You are in!", reply_markup=userKey())
 
 def creategame(update, context):
 	if checkUser(update, context, update.message):
