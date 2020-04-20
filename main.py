@@ -306,6 +306,11 @@ def buttonHandler(update, context):
 			db.commit()
 
 			context.bot.edit_message_text(chat_id=query.message.chat_id, text=theMessage, message_id=query.message.message_id)
+		elif query.data == '4':
+			cur = db.tquery("DELETE FROM game_user WHERE g_id = %s AND u_id = %s", (gameId, theUser.id))
+			db.commit()
+			context.bot.edit_message_text(chat_id=query.message.chat_id, text=theMessage, message_id=query.message.message_id, reply_markup=None)
+			updateMessage(update, context, gameId)
 
 def reply(update, context):
 	if update.message.chat_id in gcreate:
