@@ -82,7 +82,7 @@ def adminKey():
 	return InlineKeyboardMarkup(keyboard)
 
 def userKey():
-	keyboard = [InlineKeyboardButton("Exit", callback_data='4')]
+	keyboard = [[InlineKeyboardButton("Exit", callback_data='4')]]
 	return InlineKeyboardMarkup(keyboard)
 
 def updateMessage(context, gameID):
@@ -103,6 +103,7 @@ def updateMessage(context, gameID):
 	for i in range(len(userID)):
 		if userID[i] != guID:
 			reply_markup = userKey()
+			print "Tada"
 			context.bot.edit_message_text(text=message, chat_id=int(userID[i]), message_id=int(messageID[i]), reply_markup=reply_markup)
 
 	reply_markup = adminKey()
@@ -185,11 +186,8 @@ def joingame(update, context, gName):
 	if update.message.from_user.id in userID:
 		context.bot.send_message(chat_id=update.message.chat_id, text="You are already in the game!")
 	else:
-		try:
-			cur = db.tquery("INSERT INTO game_user (gu_id, g_id, u_id, m_id) VALUES (NULL, %s, %s, %s)", (gameID, update.message.from_user.id, update.message.message_id+1))
-			db.commit()
-		except:
-			print "Database update Failed"
+		cur = db.tquery("INSERT INTO game_user (gu_id, g_id, u_id, m_id) VALUES (NULL, %s, %s, %s)", (gameID, update.message.from_user.id, update.message.message_id+1))
+		db.commit()
 		context.bot.send_message(chat_id=update.message.chat_id, text="You are in!")
 		updateMessage(context, gameID)
 
