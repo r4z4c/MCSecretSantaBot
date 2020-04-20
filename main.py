@@ -96,7 +96,7 @@ def updateMessage(context, gameID):
 	userID = []
 	messageID = []
 	for i in tmpUser:
-		message += ("\n- "+str(i[0])+" "+str(i[1]))
+		message += "\n- "+str(i[0])+" "+(str(i[1]) if str(i[1]) not "None")
 		userID.append(i[2])
 		messageID.append(i[3])
 	
