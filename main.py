@@ -237,7 +237,7 @@ def buttonHandler(update, context):
 	if checkUser(update, context):
 		reply_markup = adminKey()
 
-		theUser = query.from_user
+		theUser = update.chat.from_user
 		theMessage = query.message.text
 
 		if query.data == '1' or query.data == '2' or query.data == '3':
