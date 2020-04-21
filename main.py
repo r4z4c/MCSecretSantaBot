@@ -121,6 +121,8 @@ def checkUser(update, context):
 		cur = db.tquery("INSERT INTO user (u_id, first_name, last_name, username) VALUES (%s, %s, %s, %s)", (update.message.from_user.id, update.message.from_user.first_name, update.message.from_user.last_name, update.message.from_user.username))
 		db.commit()
 
+	print "User checked"
+
 	return True
 
 def checkReply(update):
