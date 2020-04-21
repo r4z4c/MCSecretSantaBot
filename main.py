@@ -248,7 +248,7 @@ def buttonHandler(update, context):
 			message = game[0][3]
 
 			if query.data == '1':
-				cur = db.tquery("SELECT u_id FROM user WHERE u_id = (SELECT u_id FROM game_user WHERE g_id = %s)", (gameId,))
+				cur = db.tquery("SELECT u_id FROM user WHERE u_id = (SELECT u_id FROM game WHERE g_id = %s)", (gameId,))
 				gameUser = cur.fetchall()
 				userID = []
 
