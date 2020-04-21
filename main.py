@@ -258,11 +258,11 @@ def buttonHandler(update, context):
 				if theUser.id in userID:
 					cur = db.tquery("DELETE FROM game_user WHERE g_id = %s AND u_id = %s", (gameId, theUser.id))
 					db.commit()
-					updateMessage(update, context, gameId)
+					updateMessage(query, context, gameId)
 				else:
 					cur = db.tquery("INSERT INTO game_user (gu_id, g_id, u_id, m_id) VALUES (NULL, %s, %s, %s)", (gameId, theUser.id, query.message.message_id))
 					db.commit()
-					updateMessage(update, context, gameId)
+					updateMessage(query, context, gameId)
 
 			elif query.data == '2':
 				cur = db.tquery("SELECT u_id FROM game_user WHERE g_id = %s", (gameId,))
