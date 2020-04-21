@@ -92,21 +92,19 @@ def updateMessage(update, context, gameID):
 	guID = game[0][1]
 	gmID = game[0][2]
 	print "okay"
-	cur = db.tquery("SELECT u.first_name, u.last_name, u.u_id, gu.m_id FROM user AS u, game_user AS gu WHERE gu.u_id = u.u_id AND gu.g_id = %s", (gameID,))
+	cur = db.tquery("SELECT u_id, m_id FROM game_user WHERE g_id = %s", (gameID,))
 	tmpUser = cur.fetchall()
 	userID = []
 	messageID = []
 	for i in tmpUser:
-		print str(type(i[1]))
-		message += (str(update.from_user.username) if str(i[0]) == None else ("\n- "+str(i[0])+" "+("" if str(i[1]) == None else str(i[1]))))
-		userID.append(i[2])
-		messageID.append(i[3])
+		message += (str(update.from_user.username) if str(update.from_user.fitrst_name) == None else ("\n- "+str(update.from_user.fitrst_name)+" "+("" if str(update.from_user.last_name) == None else str(update.from_user.last_name))))
+		userID.append(i[0])
+		messageID.append(i[1])
 	
 	for i in range(len(userID)):
 		if userID[i] != guID:
-			reply_markup = userKey()
 			print messageID[i]
-			context.bot.edit_message_text(text=message, chat_id=int(userID[i]), message_id=int(messageID[i]), reply_markup=reply_markup)
+			context.bot.edit_message_text(text=message, chat_id=int(userID[i]), message_id=int(messageID[i]), reply_markup=userKey())
 	print gmID
 	reply_markup = adminKey()
 	context.bot.edit_message_text(text=message, chat_id=guID, message_id=gmID, reply_markup=reply_markup)
