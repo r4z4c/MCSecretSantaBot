@@ -97,7 +97,7 @@ def updateMessage(update, context, gameID):
 	userID = []
 	messageID = []
 	for i in tmpUser:
-		message += (str(update.from_user.username) if str(update.from_user.fitrst_name) == None else ("\n- "+str(update.from_user.fitrst_name)+" "+("" if str(update.from_user.last_name) == None else str(update.from_user.last_name))))
+		message += (str(update.from_user.username) if str(update.from_user.first_name) == None else ("\n- "+str(update.from_user.first_name)+" "+("" if str(update.from_user.last_name) == None else str(update.from_user.last_name))))
 		userID.append(i[0])
 		messageID.append(i[1])
 	
