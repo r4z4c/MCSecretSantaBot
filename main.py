@@ -91,6 +91,7 @@ def updateMessage(update, context, gameID):
 	message = game[0][0]
 	guID = game[0][1]
 	gmID = game[0][2]
+	print "okay"
 	cur = db.tquery("SELECT u.first_name, u.last_name, u.u_id, gu.m_id FROM user AS u, game_user AS gu WHERE gu.u_id = u.u_id AND gu.g_id = %s", (gameID,))
 	tmpUser = cur.fetchall()
 	userID = []
@@ -120,8 +121,6 @@ def checkUser(update, context):
 	if update.message.from_user.id not in theUsers:
 		cur = db.tquery("INSERT INTO user (u_id, first_name, last_name, username) VALUES (%s, %s, %s, %s)", (update.message.from_user.id, update.message.from_user.first_name, update.message.from_user.last_name, update.message.from_user.username))
 		db.commit()
-
-	print "User checked"
 
 	return True
 
