@@ -96,7 +96,7 @@ def updateMessage(update, context, gameID):
 	userID = []
 	messageID = []
 	for i in tmpUser:
-		print str(i[1])
+		print type(i[1])
 		message += (str(update.from_user.username) if str(i[0]) == None else ("\n- "+str(i[0])+" "+("" if str(i[1]) == None else str(i[1]))))
 		userID.append(i[2])
 		messageID.append(i[3])
@@ -104,9 +104,9 @@ def updateMessage(update, context, gameID):
 	for i in range(len(userID)):
 		if userID[i] != guID:
 			reply_markup = userKey()
-			print "Tada"
+			print messageID[i]
 			context.bot.edit_message_text(text=message, chat_id=int(userID[i]), message_id=int(messageID[i]), reply_markup=reply_markup)
-
+	print gmID
 	reply_markup = adminKey()
 	context.bot.edit_message_text(text=message, chat_id=guID, message_id=gmID, reply_markup=reply_markup)
 
