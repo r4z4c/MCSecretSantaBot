@@ -234,10 +234,10 @@ def join(update, context):
 def buttonHandler(update, context):
 	query = update.callback_query
 
-	if checkUser(update, context):
+	if checkUser(query, context):
 		reply_markup = adminKey()
 
-		theUser = update.chat.from_user
+		theUser = query.message.from_user
 		theMessage = query.message.text
 
 		if query.data == '1' or query.data == '2' or query.data == '3':
