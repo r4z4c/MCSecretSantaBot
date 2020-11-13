@@ -6,7 +6,7 @@ import copy
 import pymysql
 #import MySQLdb
 
-from telegram.ext import Updater, CallbackQueryHandler, CommandHandler, MessageHandler, Filters, BaseFilter
+from telegram.ext import Updater, CallbackQueryHandler, CommandHandler, MessageHandler, Filters, BaseFilter, MessageFilter
 from telegram import ForceReply, InlineKeyboardButton, InlineKeyboardMarkup, KeyboardButton, ReplyKeyboardMarkup
 import logging
 
@@ -75,7 +75,7 @@ bug = []
 
 #---main-funcions---
 
-class FilterReply(BaseFilter):
+class FilterReply(MessageFilter):
 	def filter(self, message):
 		return bool(len(gcreate)+len(gjoin)+len(feed)+len(bug))
 
@@ -124,7 +124,7 @@ def checkUser(update, context):
 		theUsers.append(int(row[0]))
 
 	if update.message.from_user.id not in theUsers:
-		cur = db.tquery("INSERT INTO user (u_id, first_name, last_name, username) VALUES (%s, %s, %s, %s)", (update.message.from_user.id, update.message.from_user.first_name, update.message.from_user.last_name, update.message.from_user.username))
+		cur = db.tquery("INSERT INTO user (u_id, first_name, last_name, username) VALUES (%s, %s, %s, %s)", (update.message.from_user.id, ("" if update.message.from_user.first_name == None else update.message.from_user.first_name), ("" if update.message.from_user.last_name == None else update.message.from_user.last_name), update.message.from_user.username))
 		db.commit()
 
 	return True
