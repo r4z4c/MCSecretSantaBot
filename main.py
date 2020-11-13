@@ -96,7 +96,7 @@ def updateMessage(update, context, gameName):
 	message = game[0][0]
 	guID = game[0][1]
 	gmID = game[0][2]
-	cur = db.tquery("SELECT gu.c_id, gu.m_id, u.first_name, u.last_name, u.username FROM game_user gu INNER JOIN user u ON u.u_id = gu.c_id WHERE gu.name = %s", (gameName,))
+	cur = db.tquery("SELECT gu.c_id, gu.m_id, u.first_name, u.last_name, u.username FROM game_user gu INNER JOIN user u ON u.u_id = gu.c_id WHERE gu.g_name = %s", (gameName,))
 	tmpUser = cur.fetchall()
 	print(tmpUser)
 	userID = []
