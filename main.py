@@ -118,7 +118,8 @@ def updateMessage(context, gameName):
 
 	if gameStatus == "aktiv":
 		if len(tmpUser) == 0:
-			if hasUserText:
+			print(hasUserText)
+			if hasUserText == 1:
 				admin_markup = adminKeyactive()
 			else:
 				admin_markup = adminKeyinactive()
@@ -347,7 +348,7 @@ def buttonHandler(update, context):
 			cur = db.tquery("SELECT c_id FROM game_user WHERE g_name = %s", (gameName,))
 			gameUser = cur.fetchall()
 			if(len(gameUser) == 0):
-				cur = db.tquery("UPDATE game SET text = %s WHERE name = %s", (1, gameName))
+				cur = db.tquery("UPDATE game SET text = %s WHERE name = %s", (0, gameName))
 				updateMessage(context, gameName)
 			else:
 				context.bot.send_message(chat_id=update.message.chat_id, text="Es dürfen kein Spieler im Spiel sein um das zu ändern!")
