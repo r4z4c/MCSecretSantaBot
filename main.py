@@ -401,6 +401,7 @@ def reply(update, context):
 	if update.message.chat_id in bug:
 		context.bot.send_message(chat_id=update.message.chat_id, text="Thank you for reporting the bug, I will try to fix this as soon as possible.")
 		bug.remove(update.message.chat_id)
+	print(gtext)
 	checkMessage = False
 	message_id = 0
 	for i in gtext:
