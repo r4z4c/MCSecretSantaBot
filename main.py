@@ -140,7 +140,7 @@ def checkUser(update, context):
 		cur = db.tquery("INSERT INTO user (u_id, first_name, last_name, username) VALUES (%s, %s, %s, %s)", (update.effective_user.id, ("" if update.effective_user.first_name == None else update.effective_user.first_name), ("" if update.effective_user.last_name == None else update.effective_user.last_name), update.effective_user.username))
 		db.commit()
 	else:
-		cur = db.tquery("UPDATE user SET first_name=%s, last_name=%s, username=%s WHERE u_id=%s", (update.effective_user.first_name, update.effective_user.last_name, update.effective_user.username, update.effective_user.id))
+		cur = db.tquery("UPDATE user SET first_name=%s, last_name=%s, username=%s WHERE u_id=%s", (str(update.effective_user.first_name), str(update.effective_user.last_name), str(update.effective_user.username), update.effective_user.id))
 		db.commit()
 	return True
 
