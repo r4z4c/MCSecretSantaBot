@@ -168,7 +168,7 @@ def checkReply(update):
 	if update.message.chat_id in bug:
 		bug.remove(update.message.chat_id)
 	if update.message.chat_id in gtext:
-		gtext.remove([update.message.chat_id, *])
+		gtext.remove(update.message.chat_id)
 
 def rtd(context, gameUser, gameName):
 	tmpUser = copy.deepcopy(gameUser)
