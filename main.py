@@ -121,6 +121,8 @@ def updateMessage(context, gameName):
 
 	for i in range(len(userID)):
 		if userID[i] != guID:
+			print(userID[i])
+			print(messageID[i])
 			context.bot.edit_message_text(text=message, chat_id=int(userID[i]), message_id=int(messageID[i]), reply_markup=user_markup)
 	print(guID)
 	print(gmID)
