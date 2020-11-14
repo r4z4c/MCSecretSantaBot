@@ -138,7 +138,7 @@ def checkUser(update, context):
 		cur = db.tquery("INSERT INTO user (u_id, first_name, last_name, username) VALUES (%s, %s, %s, %s)", (update.message.from_user.id, ("" if update.message.from_user.first_name == None else update.message.from_user.first_name), ("" if update.message.from_user.last_name == None else update.message.from_user.last_name), update.message.from_user.username))
 		db.commit()
 	elif update.message.from_user.first_name != theUser[1] or update.message.from_user.last_name != theUser[2] or update.message.from_user.username != theUser[3]:
-		cur = db.tquery("UPDATE  user SET first_name=%s, last_name=%s, username=%s WHERE u_id=%s", (update.message.from_user.first_name, update.message.from_user.last_name, update.message.from_user.username, pdate.message.from_user.id))
+		cur = db.tquery("UPDATE  user SET first_name=%s, last_name=%s, username=%s WHERE u_id=%s", (update.message.from_user.first_name, update.message.from_user.last_name, update.message.from_user.username, update.message.from_user.id))
 		db.commit()
 	return True
 
