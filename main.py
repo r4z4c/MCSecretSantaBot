@@ -404,10 +404,11 @@ def reply(update, context):
 	print(gtext)
 	checkMessage = False
 	message_id = 0
-	for i in gtext:
-		if update.message.chat_id in i[0]:
+	for user in gtext:
+		print(user)
+		if update.message.chat_id in user[0]:
 			checkMessage = True
-			message_id = i[1]
+			message_id = user[1]
 
 	if checkMessage:
 		print(gtext)
