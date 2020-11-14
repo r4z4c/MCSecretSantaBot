@@ -107,7 +107,6 @@ def updateMessage(context, gameName):
 	gmID = game[0][2]
 	cur = db.tquery("SELECT u.first_name, u.last_name, u.username, gu.c_id, gu.m_id FROM game_user gu INNER JOIN user u ON u.u_id = gu.c_id WHERE gu.g_name = %s", (gameName,))
 	tmpUser = cur.fetchall()
-	print(tmpUser)
 	userID = []
 	messageID = []
 	message = createMessage(tmpUser, gameName, gameStatus)
@@ -135,8 +134,6 @@ def checkUser(update, context):
 	allUsers = cur.fetchall()
 	theUser = []
 	for user in allUsers:
-		print(user[0])
-		print(update.effective_user.id)
 		if user[0] == update.effective_user.id:
 			theUser = user
 
@@ -334,6 +331,20 @@ def buttonHandler(update, context):
 			db.commit()
 			context.bot.edit_message_text(chat_id=query.message.chat_id, text=theMessage, message_id=query.message.message_id, reply_markup=None)
 			updateMessage(context, gameName)
+
+		elif query.data == '5':
+			if(len(gameUser) == 0):
+				cur = db.tquery("UPDATE game SET text = %s WHERE name = %s", (False, gameName))
+				updateMessage(context, gameName)
+			else:
+				context.bot.send_message(chat_id=update.message.chat_id, text="Es dürfen kein Spieler im Spiel sein um das zu ändern!")
+
+		elif query.data == '6':
+			if(len(gameUser) == 0):
+				cur = db.tquery("UPDATE game SET text = %s WHERE name = %s", (True, gameName))
+				updateMessage(context, gameName)
+			else:
+				context.bot.send_message(chat_id=update.message.chat_id, text="Es dürfen kein Spieler im Spiel sein um das zu ändern!")
 
 def reply(update, context):
 	if update.message.chat_id in gcreate:
