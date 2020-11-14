@@ -412,7 +412,7 @@ def reply(update, context):
 
 	if checkMessage:
 		print(gtext)
-		cur = db.tquery("UPDATE game_user SET text = %s WHERE c_id = %s AND m_id = %s", (update.message.text, update.message.chat_id, message_id))
+		cur = db.tquery("UPDATE game_user SET user_text = %s WHERE c_id = %s AND m_id = %s", (update.message.text, update.message.chat_id, message_id))
 		gtext.remove([update.message.chat_id, message_id])
 
 def gamerules(update, context):
