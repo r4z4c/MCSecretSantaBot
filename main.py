@@ -314,8 +314,8 @@ def buttonHandler(update, context):
 				userHasText = cur.fetchall()[0][0]
 				print(userHasText)
 				if userHasText == 1:
-					gtext.append([update.message.from_user.id, update.message.message_id+1])
-					context.bot.send_message(chat_id=update.message.chat_id, text="Das Spiel hat die Spielernachricht aktiviert, bitte gib eine Nachricht ein.")
+					gtext.append([querry.message.from_user.id, querry.message.message_id+1])
+					context.bot.send_message(chat_id=querry.message.chat_id, text="Das Spiel hat die Spielernachricht aktiviert, bitte gib eine Nachricht ein.")
 
 		elif query.data == '2':
 			cur = db.tquery("SELECT c_id FROM game_user WHERE g_name = %s", (gameName,))
