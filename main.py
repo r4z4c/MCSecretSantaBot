@@ -132,7 +132,7 @@ def checkUser(update, context):
 	theUser = []
 	for user in allUsers:
 		if user[0] == update.message.from_user.id:
-			theUser = user[0]
+			theUser = user
 
 	if len(theUser) == 0:
 		cur = db.tquery("INSERT INTO user (u_id, first_name, last_name, username) VALUES (%s, %s, %s, %s)", (update.message.from_user.id, ("" if update.message.from_user.first_name == None else update.message.from_user.first_name), ("" if update.message.from_user.last_name == None else update.message.from_user.last_name), update.message.from_user.username))
