@@ -235,7 +235,7 @@ def joingame(update, context, gameName):
 		userHasText = cur.fetchall()[0][0]
 		print(userHasText)
 		if userHasText == 1:
-			gtext.append([update.message.chat_id, update.message.message_id])
+			gtext.append([update.message.chat_id, update.message.message_id+1])
 			context.bot.send_message(chat_id=update.message.chat_id, text="Das Spiel hat die erweiterte Nachricht aktiviert. Was möchtest du deinem Wichtelpartner mitteilen?")
 
 
