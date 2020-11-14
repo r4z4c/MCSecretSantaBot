@@ -405,8 +405,8 @@ def reply(update, context):
 	checkMessage = False
 	message_id = 0
 	for user in gtext:
-		print(user)
-		if update.message.chat_id in user[0]:
+		print(user[0])
+		if update.message.chat_id == user[0]:
 			checkMessage = True
 			message_id = user[1]
 
