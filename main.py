@@ -79,8 +79,12 @@ class FilterReply(MessageFilter):
 	def filter(self, message):
 		return bool(len(gcreate)+len(gjoin)+len(feed)+len(bug))
 
-def adminKey():
-	keyboard = [[InlineKeyboardButton("Beitreten/Verlassen", callback_data='1')],[InlineKeyboardButton("Start", callback_data='2'), InlineKeyboardButton("Abbruch", callback_data='3')]]
+def adminKeyactive():
+	keyboard = [[InlineKeyboardButton("Beitreten/Verlassen", callback_data='1')],[InlineKeyboardButton("Start", callback_data='2'), InlineKeyboardButton("Abbruch", callback_data='3')], [InlineKeyboardButton("Textfeld deaktivieren", callback_data='5')]]
+	return InlineKeyboardMarkup(keyboard)
+
+def adminKeyinactive():
+	keyboard = [[InlineKeyboardButton("Beitreten/Verlassen", callback_data='1')],[InlineKeyboardButton("Start", callback_data='2'), InlineKeyboardButton("Abbruch", callback_data='3')], [InlineKeyboardButton("Textfeld aktivieren", callback_data='6')]]
 	return InlineKeyboardMarkup(keyboard)
 
 def userKey():
@@ -109,7 +113,7 @@ def updateMessage(context, gameName):
 	message = createMessage(tmpUser, gameName, gameStatus)
 
 	if gameStatus == "aktiv":
-		admin_markup = adminKey()
+		admin_markup = adminKeyinactive()
 		user_markup = userKey()
 	else:
 		admin_markup = None
@@ -140,7 +144,7 @@ def checkUser(update, context):
 		cur = db.tquery("INSERT INTO user (u_id, first_name, last_name, username) VALUES (%s, %s, %s, %s)", (update.effective_user.id, ("" if update.effective_user.first_name == None else update.effective_user.first_name), ("" if update.effective_user.last_name == None else update.effective_user.last_name), update.effective_user.username))
 		db.commit()
 	else:
-		cur = db.tquery("UPDATE user SET first_name=%s, last_name=%s, username=%s WHERE u_id=%s", (str(update.effective_user.first_name), str(update.effective_user.last_name), str(update.effective_user.username), update.effective_user.id))
+		cur = db.tquery("UPDATE user SET first_name=%s, last_name=%s, username=%s WHERE u_id=%s", (update.effective_user.first_name, update.effective_user.last_name, update.effective_user.username, update.effective_user.id))
 		db.commit()
 	return True
 
@@ -194,7 +198,7 @@ def initgame(update, context, gameName):
 	message = createMessage([], gameName, gameStatus)
 	cur = db.tquery("INSERT INTO game (name, c_id, m_id, text, status) VALUES (%s, %s, %s, %s, %s)", (gameName, update.message.chat_id, update.message.message_id+1, False, gameStatus))
 	db.commit()
-	context.bot.send_message(chat_id=update.message.chat_id, text=message, reply_markup=adminKey())
+	context.bot.send_message(chat_id=update.message.chat_id, text=message, reply_markup=adminKeyinactive())
 
 def joingame(update, context, gameName):
 	cur = db.tquery("SELECT c_id FROM game_user WHERE g_name = %s", (gameName,))
@@ -258,7 +262,7 @@ def buttonHandler(update, context):
 
 	if checkUser(update, context):
 		print("buttonHandler")
-		reply_markup = adminKey()
+		reply_markup = adminKeyinactive()
 
 		theUser = update.effective_user
 		theMessage = query.message.text
