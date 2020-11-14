@@ -189,7 +189,7 @@ def rtd(context, gameUser, gameName):
 	print(userHasText)
 
 	for i in range(0, len(gameUser)):
-		context.bot.send_message(chat_id=gameUser[i][0], text="Hey "+str(gameUser[i][1])+", dein Wichtelpartner aus dem Spiel '"+gameName+"' ist "+str(tmpUser[i][1])+(("\n\n"+str(gameUser[i][1])+" hat dir eine Nachricht hinterlassen:\n"+gameUser[i][2]) if userHasText else ""))
+		context.bot.send_message(chat_id=gameUser[i][0], text="Hey "+str(gameUser[i][1])+", dein Wichtelpartner aus dem Spiel '"+gameName+"' ist "+str(tmpUser[i][1])+(("\n\n"+str(tmpUser[i][1])+" hat dir eine Nachricht hinterlassen:\n"+tmpUser[i][2]) if userHasText else ""))
 
 def start(update, context):
 	if update.message.chat.type == "private":
