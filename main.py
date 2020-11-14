@@ -87,31 +87,33 @@ def userKey():
 	keyboard = [[InlineKeyboardButton("Exit", callback_data='4')]]
 	return InlineKeyboardMarkup(keyboard)
 
+def createMessage(tmpUser, gameName, gameStatus):
+	message="Spielname: "+str(gameName)+"\n"+"Status: "+str(gameStatus)+"\n"+"Spieler:"
+	if len(tmpUser) != 0:
+		for i in tmpUser:
+			message += "\n- "+((str(i[4]) if str(i[2]) == "None" else (str(i[2])+" "+("" if str(i[3]) == "None" else str(i[3])))))
+	return message
+
 def updateMessage(update, context, gameName):
 	print("updateMessage")
 	cur = db.tquery("SELECT status, c_id, m_id FROM game WHERE name = %s", (gameName,))
 	game = cur.fetchall()
-	print(gameName)
-	print(game)
-	message = game[0][0]
+	gameStatus = game[0][0]
 	guID = game[0][1]
 	gmID = game[0][2]
 	cur = db.tquery("SELECT gu.c_id, gu.m_id, u.first_name, u.last_name, u.username FROM game_user gu INNER JOIN user u ON u.u_id = gu.c_id WHERE gu.g_name = %s", (gameName,))
 	tmpUser = cur.fetchall()
-	print(tmpUser)
 	userID = []
 	messageID = []
-	print("users "+str(len(tmpUser)))
-	if len(tmpUser) != 0:
-		for i in tmpUser:
-			message += "\n- "+((str(i[4]) if str(i[2]) == "None" else (str(i[2])+" "+("" if str(i[3]) == "None" else str(i[3])))))
-			userID.append(i[0])
-			messageID.append(i[1])
-			print(i[3])
+	message = createMessage(tmpUser, gameName, gameStatus)
 
-		for i in range(len(userID)):
-			if userID[i] != guID:
-				context.bot.edit_message_text(text=message, chat_id=int(userID[i]), message_id=int(messageID[i]), reply_markup=userKey())
+	for i in tmpUser:
+		userID.append(i[0])
+		messageID.append(1)
+
+	for i in range(len(userID)):
+		if userID[i] != guID:
+			context.bot.edit_message_text(text=message, chat_id=int(userID[i]), message_id=int(messageID[i]), reply_markup=userKey())
 	print(guID)
 	print(gmID)
 	context.bot.edit_message_text(text=message, chat_id=guID, message_id=gmID, reply_markup=adminKey())
