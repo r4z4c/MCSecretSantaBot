@@ -168,7 +168,7 @@ def checkReply(update):
 	if update.message.chat_id in bug:
 		bug.remove(update.message.chat_id)
 	if update.message.chat_id in gtext:
-		gtext.remove(update.message.chat_id)
+		gtext.remove([update.message.chat_id, *])
 
 def rtd(context, gameUser, gameName):
 	tmpUser = copy.deepcopy(gameUser)
@@ -401,10 +401,17 @@ def reply(update, context):
 	if update.message.chat_id in bug:
 		context.bot.send_message(chat_id=update.message.chat_id, text="Thank you for reporting the bug, I will try to fix this as soon as possible.")
 		bug.remove(update.message.chat_id)
-	print(gtext)
-	if update.message.chat_id in gtext:
-		cur = db.tquery("UPDATE game_user SET text = %s WHERE name = %s", (update.message.text, ))
-		gtext.remove(update.message.chat_id)
+	checkMessage = False
+	message_id = 0
+	for i in gtext:
+		if update.message.chat_id in i[0]
+			checkMessage = True
+			message_id = i[1]
+
+	if checkMessage:
+		print(gtext)
+		cur = db.tquery("UPDATE game_user SET text = %s WHERE c_id = %s AND m_id = %s", (update.message.text, update.message.chat_id, message_id))
+		gtext.remove([update.message.chat_id, message_id])
 
 def gamerules(update, context):
 	context.bot.send_message(chat_id=update.message.chat_id, text="Rules:\nFirstly add me to a group.\nSecondly type in '/creategame [gamename]'.\nThirdly all users that want to play with you have to start a privat chat with me, then click the 'Join' button.\nAt the End the user who created the game (the admin) has to click 'Start'.\n\nOnce the game is started, each user gets a privat message from me with the randomly chosen player, the user has to get a gift for.")
