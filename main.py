@@ -424,7 +424,7 @@ def gamerules(update, context):
 	context.bot.send_message(chat_id=update.message.chat_id, text="Anleitung:\nZunächst muss ein neues Spiel gestartet werden, nutze dafür den Befehl /neu.\nDanach können andere Spieler dem Spiel mit dem Befehl /spiel beitreten\nWenn alle dem Spiel beigetreten sind kann der Administrator das Spiel Starten.\nNachdem das Spiel dann gestartet wurde bekommt jeder seinen Wichtelpartner zugewiesen.")
 
 def help(update, context):
-	update.message.reply_text("Kommandoliste:\n/start - um den Chat mit MCSecretSantaBot zu starten.\n/anleitung - um eine Spielanleitung zu bekommen.\n/neu [Spielname]- um ein Spiel zu erstellen.\n/hilfe - um alle Kommandos angezeigt zu bekommen.\n/feedback - um deine Meinung über den Bot mitzuteilen.\n/fehlermeldung - wenn ein Fehler augetreten ist.")
+	update.message.reply_text("Kommandoliste:\n/start - um den Chat mit MCSecretSantaBot zu starten.\n/anleitung - um eine Spielanleitung zu bekommen.\n/neu [Spielname]- um ein Spiel zu erstellen.\n/spiel - um einem Spiel beizutreten\n/hilfe - um alle Kommandos angezeigt zu bekommen.\n/feedback - um deine Meinung über den Bot mitzuteilen.\n/fehlermeldung - wenn ein Fehler augetreten ist.")
 
 def feedback(update, context):
 	context.bot.send_message(chat_id=update.message.chat_id, text="Bitte gib deine Rückmeldung an.")
