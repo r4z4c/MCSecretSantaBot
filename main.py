@@ -117,7 +117,7 @@ def updateMessage(context, gameName):
 	message = createMessage(tmpUser, gameName, gameStatus)
 
 	if gameStatus == "aktiv":
-		if len(tmpUser) != 0:
+		if len(tmpUser) == 0:
 			if hasUserText:
 				admin_markup = adminKeyactive()
 			else:
