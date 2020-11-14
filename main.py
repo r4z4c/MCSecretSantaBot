@@ -85,11 +85,11 @@ def adminKey():
 	return InlineKeyboardMarkup(keyboard)
 
 def adminKeyactive():
-	keyboard = [[InlineKeyboardButton("Beitreten/Verlassen", callback_data='1')],[InlineKeyboardButton("Start", callback_data='2'), InlineKeyboardButton("Abbruch", callback_data='3')], [InlineKeyboardButton("Textfeld deaktivieren", callback_data='5')]]
+	keyboard = [[InlineKeyboardButton("Beitreten/Verlassen", callback_data='1')],[InlineKeyboardButton("Start", callback_data='2'), InlineKeyboardButton("Abbruch", callback_data='3')], [InlineKeyboardButton("erweiterte Nachricht deaktivieren", callback_data='5')]]
 	return InlineKeyboardMarkup(keyboard)
 
 def adminKeyinactive():
-	keyboard = [[InlineKeyboardButton("Beitreten/Verlassen", callback_data='1')],[InlineKeyboardButton("Start", callback_data='2'), InlineKeyboardButton("Abbruch", callback_data='3')], [InlineKeyboardButton("Textfeld aktivieren", callback_data='6')]]
+	keyboard = [[InlineKeyboardButton("Beitreten/Verlassen", callback_data='1')],[InlineKeyboardButton("Start", callback_data='2'), InlineKeyboardButton("Abbruch", callback_data='3')], [InlineKeyboardButton("erweiterte Nachricht aktivieren", callback_data='6')]]
 	return InlineKeyboardMarkup(keyboard)
 
 def userKey():
@@ -189,12 +189,12 @@ def rtd(context, gameUser, gameName):
 	print(userHasText)
 
 	for i in range(0, len(gameUser)):
-		context.bot.send_message(chat_id=gameUser[i][0], text="Hey "+str(gameUser[i][1])+", dein Wichtelpartner aus dem Spiel '"+gameName+"' ist "+str(tmpUser[i][1])+(("\n"+str(gameUser[i][1])+" hat dir eine Nachricht hinterlassen:\n"+gameUser[i][2]) if userHasText else ""))
+		context.bot.send_message(chat_id=gameUser[i][0], text="Hey "+str(gameUser[i][1])+", dein Wichtelpartner aus dem Spiel '"+gameName+"' ist "+str(tmpUser[i][1])+(("\n\n"+str(gameUser[i][1])+" hat dir eine Nachricht hinterlassen:\n"+gameUser[i][2]) if userHasText else ""))
 
 def start(update, context):
 	if update.message.chat.type == "private":
 		checkUser(update, context)
-		context.bot.send_message(chat_id=update.message.chat_id, text="Willkommen im MCSecretSantaBot tippe /help um mehr Informationen zu erhalten.")
+		context.bot.send_message(chat_id=update.message.chat_id, text="Willkommen beim MCSecretSantaBot tippe /hilfe um mehr Informationen zu erhalten.")
 
 def checkGame(update, context, name):
 	cur = db.squery("SELECT name FROM game")
@@ -229,14 +229,14 @@ def joingame(update, context, gameName):
 	else:
 		cur = db.tquery("INSERT INTO game_user (g_name, c_id, m_id, user_text) VALUES (%s, %s, %s, %s)", (gameName, update.message.from_user.id, update.message.message_id+1, ""))
 		db.commit()
-		context.bot.send_message(chat_id=update.message.chat_id, text="Du bist drin!")
+		context.bot.send_message(chat_id=update.message.chat_id, text="Du bist '"+gameName+"' beigetreten!")
 		updateMessage(context, gameName)
 		cur = db.tquery("SELECT text FROM game WHERE name = %s", (gameName,))
 		userHasText = cur.fetchall()[0][0]
 		print(userHasText)
 		if userHasText == 1:
 			gtext.append([update.message.chat_id, update.message.message_id])
-			context.bot.send_message(chat_id=update.message.chat_id, text="Das Spiel hat die Spielernachricht aktiviert, bitte gib eine Nachricht ein.")
+			context.bot.send_message(chat_id=update.message.chat_id, text="Das Spiel hat die erweiterte Nachricht aktiviert. Was möchtest du deinem Wichtelpartner mitteilen?")
 
 
 def creategame(update, context):
@@ -252,11 +252,11 @@ def creategame(update, context):
 			if not checkGame(update, context, gameName):
 				initgame(update, context, gameName)
 			else:
-				context.bot.send_message(chat_id=update.message.chat_id, reply_to_message_id=update.message.message_id, text="A game with this name is already running!\nPlease type in a different name.")
+				context.bot.send_message(chat_id=update.message.chat_id, text="Ein Spiel mit diesem Namen läuft schon, bitte wähle einen anderen Namen.")
 				checkReply(update)
 				gcreate.append(update.message.chat_id)
 		else:
-			context.bot.send_message(chat_id=update.message.chat_id, reply_to_message_id=update.message.message_id, text="Type in the game name")
+			context.bot.send_message(chat_id=update.message.chat_id, text="Wähle einen Namen für dein Spiel.")
 			checkReply(update)
 			gcreate.append(update.message.chat_id)
 
@@ -274,9 +274,9 @@ def join(update, context):
 			if checkGame(update, context, gameName):
 				joingame(update, context, gameName)
 			else:
-				context.bot.send_message(chat_id=update.message.chat_id, reply_to_message_id=update.message.message_id, text="A game with this name does not exist!\nPlease type in a existing gamename.")
+				context.bot.send_message(chat_id=update.message.chat_id, reply_to_message_id=update.message.message_id, text="Ein Spiel mit diesem Namen gibt es nicht, bitte gib den Namen eines laufenden Spieles an.")
 		else:
-			context.bot.send_message(chat_id=update.message.chat_id, reply_to_message_id=update.message.message_id, text="Type in the game name")
+			context.bot.send_message(chat_id=update.message.chat_id, reply_to_message_id=update.message.message_id, text="Gib den Namen eines laufenden Spieles ein.")
 			checkReply(update)
 			gjoin.append(update.message.chat_id)
 
@@ -317,7 +317,7 @@ def buttonHandler(update, context):
 				print(userHasText)
 				if userHasText == 1:
 					gtext.append([query.message.chat_id, query.message.message_id])
-					context.bot.send_message(chat_id=query.message.chat_id, text="Das Spiel hat die Spielernachricht aktiviert, bitte gib eine Nachricht ein.")
+					context.bot.send_message(chat_id=query.message.chat_id, text="Das Spiel hat die erweiterte Nachricht aktiviert. Was möchtest du deinem Wichtelpartner mitteilen?")
 
 		elif query.data == '2':
 			cur = db.tquery("SELECT c_id, user_text FROM game_user WHERE g_name = %s", (gameName,))
@@ -371,7 +371,7 @@ def buttonHandler(update, context):
 				db.commit()
 				updateMessage(context, gameName)
 			else:
-				context.bot.send_message(chat_id=update.message.chat_id, text="Es dürfen kein Spieler im Spiel sein um das zu ändern!")
+				context.bot.send_message(chat_id=update.message.chat_id, text="Es dürfen keine Spieler im Spiel sein um das zu ändern!")
 
 		elif query.data == '6':
 			cur = db.tquery("SELECT c_id FROM game_user WHERE g_name = %s", (gameName,))
@@ -381,12 +381,12 @@ def buttonHandler(update, context):
 				db.commit()
 				updateMessage(context, gameName)
 			else:
-				context.bot.send_message(chat_id=update.message.chat_id, text="Es dürfen kein Spieler im Spiel sein um das zu ändern!")
+				context.bot.send_message(chat_id=update.message.chat_id, text="Es dürfen keine Spieler im Spiel sein um das zu ändern!")
 
 def reply(update, context):
 	if update.message.chat_id in gcreate:
 		if checkGame(update, context, update.message.text):
-			context.bot.send_message(chat_id=update.message.chat_id, reply_to_message_id=update.message.message_id, text="A game with this name is already running!\nPlease type in a different name.")
+			context.bot.send_message(chat_id=update.message.chat_id, reply_to_message_id=update.message.message_id, text="Ein Spiel mit diesem Namen läuft schon, bitte wähle einen anderen Namen.")
 		else:
 			initgame(update, context, update.message.text)
 			gcreate.remove(update.message.chat_id)
@@ -396,14 +396,14 @@ def reply(update, context):
 			joingame(update, context, update.message.text)
 			gjoin.remove(update.message.chat_id)
 		else:
-			context.bot.send_message(chat_id=update.message.chat_id, reply_to_message_id=update.message.message_id, text="A game with this name does not exist!\nPlease type in a existing gamename.")
+			context.bot.send_message(chat_id=update.message.chat_id, reply_to_message_id=update.message.message_id, text="Ein Spiel mit diesem Namen gibt es nicht, bitte gib den Namen eines laufenden Spieles an.")
 
 	if update.message.chat_id in feed:
-		context.bot.send_message(chat_id=update.message.chat_id, text="Thank you for your feedback, I appreciate your time and thank you for using the bot.")
+		context.bot.send_message(chat_id=update.message.chat_id, text="Danke für dein Feedback, das hilft um den Bot immer weiter zu verbessern.")
 		feed.remove(update.message.chat_id)
 
 	if update.message.chat_id in bug:
-		context.bot.send_message(chat_id=update.message.chat_id, text="Thank you for reporting the bug, I will try to fix this as soon as possible.")
+		context.bot.send_message(chat_id=update.message.chat_id, text="Danke für den Fehlerberricht, das Problem wird so schnell wie Möglich angegangen.")
 		bug.remove(update.message.chat_id)
 	print(gtext)
 	checkMessage = False
@@ -421,18 +421,18 @@ def reply(update, context):
 		gtext.remove([update.message.chat_id, message_id])
 
 def gamerules(update, context):
-	context.bot.send_message(chat_id=update.message.chat_id, text="Rules:\nFirstly add me to a group.\nSecondly type in '/creategame [gamename]'.\nThirdly all users that want to play with you have to start a privat chat with me, then click the 'Join' button.\nAt the End the user who created the game (the admin) has to click 'Start'.\n\nOnce the game is started, each user gets a privat message from me with the randomly chosen player, the user has to get a gift for.")
+	context.bot.send_message(chat_id=update.message.chat_id, text="Anleitung:\nZunächst muss ein neues Spiel gestartet werden, nutze dafür den Befehl /neu.\nDanach können andere Spieler dem Spiel mit dem Befehl /spiel beitreten\nWenn alle dem Spiel beigetreten sind kann der Administrator das Spiel Starten.\nNachdem das Spiel dann gestartet wurde bekommt jeder seinen Wichtelpartner zugewiesen.")
 
 def help(update, context):
-	update.message.reply_text("Commandlist:\n/start - for starting a conversation with MCSecretSantaBot\n/gamerules - for displaying the rules of the game\n/creategame [game name] - for creating a new game\n/help - for this help message\n/feedback - for improving the bot experience\n/bugreport - for reporting bugs")
+	update.message.reply_text("Kommandoliste:\n/start - um den Chat mit MCSecretSantaBot zu starten.\n/anleitung - um eine Spielanleitung zu bekommen.\n/neu [Spielname]- um ein Spiel zu erstellen.\n/hilfe - um alle Kommandos angezeigt zu bekommen.\n/feedback - um deine Meinung über den Bot mitzuteilen.\n/fehlermeldung - wenn ein Fehler augetreten ist.")
 
 def feedback(update, context):
-	context.bot.send_message(chat_id=update.message.chat_id, text="Please type in the Feedback")
+	context.bot.send_message(chat_id=update.message.chat_id, text="Bitte gib deine Rückmeldung an.")
 	checkReply(update)
 	feed.append(update.message.chat_id)
 
 def bugreport(update, context):
-	context.bot.send_message(chat_id=update.message.chat_id, text="Please type in the Bugreport")
+	context.bot.send_message(chat_id=update.message.chat_id, text="Bitte gib an was schiefgelaufen ist.")
 	checkReply(update)
 	bug.append(update.message.chat_id)
 
@@ -441,7 +441,7 @@ def error(update, context):
 	logger.warning('Update "%s" caused error "%s"', update, context.error)
 
 def unknown(update, context):
-	context.bot.send_message(chat_id=update.message.chat_id, text="Sorry, I didn't understand that command.")
+	context.bot.send_message(chat_id=update.message.chat_id, text="Tut mir leid, den Befehl kenne ich nicht.")
 
 def secretsanta():
 	#---setup---
@@ -455,20 +455,20 @@ def secretsanta():
 	dp = updater.dispatcher
 
 	dp.add_error_handler(error)
-	dp.add_handler(CommandHandler('help', help))
+	dp.add_handler(CommandHandler('hilfe', help))
 	dp.add_handler(CommandHandler('start', start))
-	dp.add_handler(CommandHandler('creategame', creategame, pass_args=True))
-	dp.add_handler(CommandHandler('join', join, pass_args=True))
+	dp.add_handler(CommandHandler('neu', creategame, pass_args=True))
+	dp.add_handler(CommandHandler('spiel', join, pass_args=True))
 	dp.add_handler(CallbackQueryHandler(buttonHandler))
-	dp.add_handler(CommandHandler('gamerules', gamerules))
+	dp.add_handler(CommandHandler('anleitung', gamerules))
 	dp.add_handler(CommandHandler('feedback', feedback))
-	dp.add_handler(CommandHandler('bugreport', bugreport))
+	dp.add_handler(CommandHandler('fehlermeldung', bugreport))
 	dp.add_handler(MessageHandler(Filters.command, unknown))
 	dp.add_handler(MessageHandler(filter_reply, reply))
 
 	#---start-bot---
 	updater.start_polling()
-	print("\nstarted")
+	print("\n---Bot Gestartet---")
 	updater.idle()
 
 def main():
