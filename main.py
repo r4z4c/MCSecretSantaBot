@@ -309,6 +309,12 @@ def buttonHandler(update, context):
 				cur = db.tquery("INSERT INTO game_user (g_name, c_id, m_id, user_text) VALUES (%s, %s, %s, %s)", (gameName, theUser.id, query.message.message_id, ""))
 				db.commit()
 				updateMessage(context, gameName)
+				cur = db.tquery("SELECT text FROM game WHERE name = %s", (gameName,))
+				userHasText = db.commit()
+				print(userHasText)
+				if userHasText == 1:
+					gtext.append([update.message.from_user.id, update.message.message_id+1])
+					context.bot.send_message(chat_id=update.message.chat_id, text="Das Spiel hat die Spielernachricht aktiviert, bitte gib eine Nachricht ein.")
 
 		elif query.data == '2':
 			cur = db.tquery("SELECT c_id FROM game_user WHERE g_name = %s", (gameName,))
