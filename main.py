@@ -384,6 +384,14 @@ def buttonHandler(update, context):
 				context.bot.send_message(chat_id=update.message.chat_id, text="Es dürfen keine Spieler im Spiel sein um das zu ändern!")
 
 def reply(update, context):
+	checkMessage = False
+	message_id = 0
+	for user in gtext:
+		print(user[0])
+		if update.message.chat_id == user[0]:
+			checkMessage = True
+			message_id = user[1]
+
 	if update.message.chat_id in gcreate:
 		if checkGame(update, context, update.message.text):
 			context.bot.send_message(chat_id=update.message.chat_id, reply_to_message_id=update.message.message_id, text="Ein Spiel mit diesem Namen läuft schon, bitte wähle einen anderen Namen.")
@@ -399,20 +407,16 @@ def reply(update, context):
 			context.bot.send_message(chat_id=update.message.chat_id, reply_to_message_id=update.message.message_id, text="Ein Spiel mit diesem Namen gibt es nicht, bitte gib den Namen eines laufenden Spieles an.")
 
 	if update.message.chat_id in feed:
+		cur = db.tquery("INSERT INTO feedback (f_id, text) VALUES (NULL, %s)", (update.message.text,))
+		db.commit()
 		context.bot.send_message(chat_id=update.message.chat_id, text="Danke für dein Feedback, das hilft um den Bot immer weiter zu verbessern.")
 		feed.remove(update.message.chat_id)
 
 	if update.message.chat_id in bug:
+		cur = db.tquery("INSERT INTO bugreport (b_id, text) VALUES (NULL, %s)", (update.message.text,))
+		db.commit()
 		context.bot.send_message(chat_id=update.message.chat_id, text="Danke für den Fehlerberricht, das Problem wird so schnell wie Möglich angegangen.")
 		bug.remove(update.message.chat_id)
-	print(gtext)
-	checkMessage = False
-	message_id = 0
-	for user in gtext:
-		print(user[0])
-		if update.message.chat_id == user[0]:
-			checkMessage = True
-			message_id = user[1]
 
 	if checkMessage:
 		print(gtext)
