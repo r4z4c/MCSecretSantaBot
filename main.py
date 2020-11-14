@@ -91,7 +91,7 @@ def createMessage(tmpUser, gameName, gameStatus):
 	message="Spielname: "+str(gameName)+"\n"+"Status: "+str(gameStatus)+"\n"+"Spieler:"
 	if len(tmpUser) != 0:
 		for i in tmpUser:
-			message += "\n- "+((str(i[4]) if str(i[2]) == "None" else (str(i[2])+" "+("" if str(i[3]) == "None" else str(i[3])))))
+			message += "\n- "+((str(i[2]) if str(i[0]) == "None" else (str(i[0])+" "+("" if str(i[1]) == "None" else str(i[1])))))
 	return message
 
 def updateMessage(update, context, gameName):
@@ -101,15 +101,15 @@ def updateMessage(update, context, gameName):
 	gameStatus = game[0][0]
 	guID = game[0][1]
 	gmID = game[0][2]
-	cur = db.tquery("SELECT gu.c_id, gu.m_id, u.first_name, u.last_name, u.username FROM game_user gu INNER JOIN user u ON u.u_id = gu.c_id WHERE gu.g_name = %s", (gameName,))
+	cur = db.tquery("SELECT u.first_name, u.last_name, u.username, gu.c_id, gu.m_id FROM game_user gu INNER JOIN user u ON u.u_id = gu.c_id WHERE gu.g_name = %s", (gameName,))
 	tmpUser = cur.fetchall()
 	userID = []
 	messageID = []
 	message = createMessage(tmpUser, gameName, gameStatus)
 
 	for i in tmpUser:
-		userID.append(i[0])
-		messageID.append(1)
+		userID.append(i[3])
+		messageID.append(4)
 
 	for i in range(len(userID)):
 		if userID[i] != guID:
@@ -177,8 +177,9 @@ def checkGame(update, context, name):
 		return False
 
 def initgame(update, context, gameName):
-	message = "game: "+str(gameName)+"\nstatus: waiting for players!\nadmin: "+("" if update.message.from_user.first_name == None else str(update.message.from_user.first_name))+" "+("" if update.message.from_user.last_name == None else str(update.message.from_user.last_name)+"\n\nmembers:")
-	cur = db.tquery("INSERT INTO game (name, c_id, m_id, status) VALUES (%s, %s, %s, %s)", (gameName, update.message.chat_id, update.message.message_id+1, message))
+	gameStatus = "waiting"
+	message = createMessage([], gameName, gameStatus)
+	cur = db.tquery("INSERT INTO game (name, c_id, m_id, text, status) VALUES (%s, %s, %s, %s, %s)", (gameName, update.message.chat_id, update.message.message_id+1, False, gameStatus))
 	db.commit()
 	context.bot.send_message(chat_id=update.message.chat_id, text=message, reply_markup=adminKey())
 
