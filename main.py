@@ -232,11 +232,10 @@ def joingame(update, context, gameName):
 		context.bot.send_message(chat_id=update.message.chat_id, text="Du bist drin!")
 		updateMessage(context, gameName)
 		cur = db.tquery("SELECT text FROM game WHERE name = %s", (gameName,))
-		userHasText = db.commit()[0]
-		print(gameName)
+		userHasText = cur.fetchall()[0][0]
 		print(userHasText)
 		if userHasText == 1:
-			gtext.append([update.message.from_user.id, update.message.message_id+1])
+			gtext.append([update.message.chat_id, update.message.message_id])
 			context.bot.send_message(chat_id=update.message.chat_id, text="Das Spiel hat die Spielernachricht aktiviert, bitte gib eine Nachricht ein.")
 
 
@@ -310,7 +309,6 @@ def buttonHandler(update, context):
 				db.commit()
 				updateMessage(context, gameName)
 			else:
-				print(theUser)
 				cur = db.tquery("INSERT INTO game_user (g_name, c_id, m_id, user_text) VALUES (%s, %s, %s, %s)", (gameName, theUser.id, query.message.message_id, ""))
 				db.commit()
 				updateMessage(context, gameName)
