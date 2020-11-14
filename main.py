@@ -184,8 +184,12 @@ def rtd(context, gameUser, gameName):
 
 	updateMessage(context, gameName)
 
+	cur = db.tquery("SELECT text FROM game WHERE name = %s", (gameName,))
+	userHasText = cur.fetchall()[0][0]
+	print(userHasText)
+
 	for i in range(0, len(gameUser)):
-		context.bot.send_message(chat_id=gameUser[i][0], text="Hey "+str(gameUser[i][1])+", dein Wichtelpartner aus dem Spiel '"+gameName+"' ist "+str(tmpUser[i][1]))
+		context.bot.send_message(chat_id=gameUser[i][0], text="Hey "+str(gameUser[i][1])+", dein Wichtelpartner aus dem Spiel '"+gameName+"' ist "+str(tmpUser[i][1])+(("\n"+str(gameUser[i][1])+" hat dir eine Nachricht hinterlassen:\n"+gameUser[i][2]) if userHasText else ""))
 
 def start(update, context):
 	if update.message.chat.type == "private":
@@ -318,7 +322,7 @@ def buttonHandler(update, context):
 					context.bot.send_message(chat_id=query.message.chat_id, text="Das Spiel hat die Spielernachricht aktiviert, bitte gib eine Nachricht ein.")
 
 		elif query.data == '2':
-			cur = db.tquery("SELECT c_id FROM game_user WHERE g_name = %s", (gameName,))
+			cur = db.tquery("SELECT c_id, user_text FROM game_user WHERE g_name = %s", (gameName,))
 			tmpUser = cur.fetchall()
 			tgameUser = []
 			gameUser = []
@@ -327,7 +331,7 @@ def buttonHandler(update, context):
 				tUser = cur.fetchall()
 				tgameUser.append(int(tmpUser[i][0]))
 				tgameUser.append(str(tUser[0][0])+str(tUser[0][1]))
-				gameUser.append([int(tmpUser[i][0]), (str(tUser[0][2]) if str(tUser[0][0]) == "None" else (str(tUser[0][0]) +("" if str(tUser[0][1])== "None" else " "+str(tUser[0][1]))))])
+				gameUser.append([int(tmpUser[i][0]), (str(tUser[0][2]) if str(tUser[0][0]) == "None" else (str(tUser[0][0]) +("" if str(tUser[0][1])== "None" else " "+str(tUser[0][1])))), str(tmpUser[i][1])])
 
 			if len(gameUser) > 2:
 				cur = db.tquery("UPDATE game SET status = %s WHERE name = %s", ("beendet", gameName))
