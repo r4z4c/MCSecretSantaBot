@@ -68,6 +68,7 @@ if DEBUG == True:
 
 #variables
 gcreate = []
+gtext= []
 gjoin = []
 feed = []
 bug = []
@@ -77,7 +78,7 @@ bug = []
 
 class FilterReply(MessageFilter):
 	def filter(self, message):
-		return bool(len(gcreate)+len(gjoin)+len(feed)+len(bug))
+		return bool(len(gcreate)+len(gjoin)+len(feed)+len(bug)+len(gtext))
 
 def adminKey():
 	keyboard = [[InlineKeyboardButton("Beitreten/Verlassen", callback_data='1')],[InlineKeyboardButton("Start", callback_data='2'), InlineKeyboardButton("Abbruch", callback_data='3')]]
@@ -166,6 +167,8 @@ def checkReply(update):
 		feed.remove(update.message.chat_id)
 	if update.message.chat_id in bug:
 		bug.remove(update.message.chat_id)
+	if update.message.chat_id in gtext:
+		gtext.remove(update.message.chat_id)
 
 def rtd(context, gameUser, gameName):
 	tmpUser = copy.deepcopy(gameUser)
@@ -220,10 +223,16 @@ def joingame(update, context, gameName):
 	if update.message.from_user.id in userID:
 		context.bot.send_message(chat_id=update.message.chat_id, text="Du bist dem Spiel berreits beigetreten.")
 	else:
-		print(context.bot.send_message(chat_id=update.message.chat_id, text="Du bist drin!"))
 		cur = db.tquery("INSERT INTO game_user (g_name, c_id, m_id, user_text) VALUES (%s, %s, %s, %s)", (gameName, update.message.from_user.id, update.message.message_id+1, ""))
 		db.commit()
+		context.bot.send_message(chat_id=update.message.chat_id, text="Du bist drin!")
 		updateMessage(context, gameName)
+		cur = db.tquery("SELECT text FROM game WHERE name = %s", (gameName,))
+		userHasText = db.commit()
+		if userHasText == 1:
+			gtext.append([update.message.from_user.id, update.message.message_id+1])
+			context.bot.send_message(chat_id=update.message.chat_id, text="Das Spiel hat die Spielernachricht aktiviert, bitte gib eine Nachricht ein.")
+
 
 def creategame(update, context):
 	if checkUser(update, context):
@@ -384,6 +393,10 @@ def reply(update, context):
 	if update.message.chat_id in bug:
 		context.bot.send_message(chat_id=update.message.chat_id, text="Thank you for reporting the bug, I will try to fix this as soon as possible.")
 		bug.remove(update.message.chat_id)
+
+	if update.message.chat_id in gtext:
+		cur = db.tquery("UPDATE game_user SET text = %s WHERE name = %s", (update.message.text, ))
+		gtext.remove(update.message.chat_id)
 
 def gamerules(update, context):
 	context.bot.send_message(chat_id=update.message.chat_id, text="Rules:\nFirstly add me to a group.\nSecondly type in '/creategame [gamename]'.\nThirdly all users that want to play with you have to start a privat chat with me, then click the 'Join' button.\nAt the End the user who created the game (the admin) has to click 'Start'.\n\nOnce the game is started, each user gets a privat message from me with the randomly chosen player, the user has to get a gift for.")
