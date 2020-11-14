@@ -131,8 +131,9 @@ def checkUser(update, context):
 	allUsers = cur.fetchall()
 	theUser = []
 	for user in allUsers:
+		print(user[0])
+		print(update.message.from_user.id)
 		if user[0] == update.message.from_user.id:
-			print(update.message.from_user.id)
 			theUser = user
 
 	if len(theUser) == 0:
