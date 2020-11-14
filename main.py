@@ -79,7 +79,7 @@ class FilterReply(MessageFilter):
 	def filter(self, message):
 		return bool(len(gcreate)+len(gjoin)+len(feed)+len(bug))
 
-def adminKeyactive():
+def adminKey():
 	keyboard = [[InlineKeyboardButton("Beitreten/Verlassen", callback_data='1')],[InlineKeyboardButton("Start", callback_data='2'), InlineKeyboardButton("Abbruch", callback_data='3')]]
 	return InlineKeyboardMarkup(keyboard)
 
