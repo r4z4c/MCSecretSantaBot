@@ -347,7 +347,7 @@ def buttonHandler(update, context):
 			cur = db.tquery("SELECT c_id FROM game_user WHERE g_name = %s", (gameName,))
 			gameUser = cur.fetchall()
 			if(len(gameUser) == 0):
-				cur = db.tquery("UPDATE game SET text = %s WHERE name = %s", (False, gameName))
+				cur = db.tquery("UPDATE game SET text = %s WHERE name = %s", (1, gameName))
 				updateMessage(context, gameName)
 			else:
 				context.bot.send_message(chat_id=update.message.chat_id, text="Es dürfen kein Spieler im Spiel sein um das zu ändern!")
@@ -356,7 +356,7 @@ def buttonHandler(update, context):
 			cur = db.tquery("SELECT c_id FROM game_user WHERE g_name = %s", (gameName,))
 			gameUser = cur.fetchall()
 			if(len(gameUser) == 0):
-				cur = db.tquery("UPDATE game SET text = %s WHERE name = %s", (True, gameName))
+				cur = db.tquery("UPDATE game SET text = %s WHERE name = %s", (1, gameName))
 				updateMessage(context, gameName)
 			else:
 				context.bot.send_message(chat_id=update.message.chat_id, text="Es dürfen kein Spieler im Spiel sein um das zu ändern!")
