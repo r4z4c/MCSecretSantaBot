@@ -366,6 +366,7 @@ def buttonHandler(update, context):
 			gameUser = cur.fetchall()
 			if(len(gameUser) == 0):
 				cur = db.tquery("UPDATE game SET text = %s WHERE name = %s", (0, gameName))
+				db.commit()
 				updateMessage(context, gameName)
 			else:
 				context.bot.send_message(chat_id=update.message.chat_id, text="Es dürfen kein Spieler im Spiel sein um das zu ändern!")
@@ -375,6 +376,7 @@ def buttonHandler(update, context):
 			gameUser = cur.fetchall()
 			if(len(gameUser) == 0):
 				cur = db.tquery("UPDATE game SET text = %s WHERE name = %s", (1, gameName))
+				db.commit()
 				updateMessage(context, gameName)
 			else:
 				context.bot.send_message(chat_id=update.message.chat_id, text="Es dürfen kein Spieler im Spiel sein um das zu ändern!")
@@ -413,6 +415,7 @@ def reply(update, context):
 	if checkMessage:
 		print(gtext)
 		cur = db.tquery("UPDATE game_user SET user_text = %s WHERE c_id = %s AND m_id = %s", (update.message.text, update.message.chat_id, message_id))
+		db.commit()
 		gtext.remove([update.message.chat_id, message_id])
 
 def gamerules(update, context):
