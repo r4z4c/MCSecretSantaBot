@@ -401,7 +401,7 @@ def reply(update, context):
 	if update.message.chat_id in bug:
 		context.bot.send_message(chat_id=update.message.chat_id, text="Thank you for reporting the bug, I will try to fix this as soon as possible.")
 		bug.remove(update.message.chat_id)
-
+	print(gtext)
 	if update.message.chat_id in gtext:
 		cur = db.tquery("UPDATE game_user SET text = %s WHERE name = %s", (update.message.text, ))
 		gtext.remove(update.message.chat_id)
