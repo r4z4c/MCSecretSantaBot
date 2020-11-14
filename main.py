@@ -132,15 +132,15 @@ def checkUser(update, context):
 	theUser = []
 	for user in allUsers:
 		print(user[0])
-		print(update.message.from_user.id)
-		if user[0] == update.message.from_user.id:
+		print(update.effective_user.id)
+		if user[0] == update.effective_user.id:
 			theUser = user
 
 	if len(theUser) == 0:
-		cur = db.tquery("INSERT INTO user (u_id, first_name, last_name, username) VALUES (%s, %s, %s, %s)", (update.message.from_user.id, ("" if update.message.from_user.first_name == None else update.message.from_user.first_name), ("" if update.message.from_user.last_name == None else update.message.from_user.last_name), update.message.from_user.username))
+		cur = db.tquery("INSERT INTO user (u_id, first_name, last_name, username) VALUES (%s, %s, %s, %s)", (update.effective_user.id, ("" if update.effective_user.first_name == None else update.effective_user.first_name), ("" if update.effective_user.last_name == None else update.effective_user.last_name), update.effective_user.username))
 		db.commit()
 	else:
-		cur = db.tquery("UPDATE user SET first_name=%s, last_name=%s, username=%s WHERE u_id=%s", (update.message.from_user.first_name, update.message.from_user.last_name, update.message.from_user.username, update.message.from_user.id))
+		cur = db.tquery("UPDATE user SET first_name=%s, last_name=%s, username=%s WHERE u_id=%s", (update.effective_user.first_name, update.effective_user.last_name, update.effective_user.username, update.effective_user.id))
 		db.commit()
 	return True
 
@@ -256,7 +256,7 @@ def join(update, context):
 def buttonHandler(update, context):
 	query = update.callback_query
 
-	if checkUser(query, context):
+	if checkUser(update, context):
 		print("buttonHandler")
 		reply_markup = adminKey()
 
