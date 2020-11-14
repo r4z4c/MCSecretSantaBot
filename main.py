@@ -80,6 +80,10 @@ class FilterReply(MessageFilter):
 		return bool(len(gcreate)+len(gjoin)+len(feed)+len(bug))
 
 def adminKeyactive():
+	keyboard = [[InlineKeyboardButton("Beitreten/Verlassen", callback_data='1')],[InlineKeyboardButton("Start", callback_data='2'), InlineKeyboardButton("Abbruch", callback_data='3')]]
+	return InlineKeyboardMarkup(keyboard)
+
+def adminKeyactive():
 	keyboard = [[InlineKeyboardButton("Beitreten/Verlassen", callback_data='1')],[InlineKeyboardButton("Start", callback_data='2'), InlineKeyboardButton("Abbruch", callback_data='3')], [InlineKeyboardButton("Textfeld deaktivieren", callback_data='5')]]
 	return InlineKeyboardMarkup(keyboard)
 
@@ -100,11 +104,12 @@ def createMessage(tmpUser, gameName, gameStatus):
 
 def updateMessage(context, gameName):
 	print("updateMessage")
-	cur = db.tquery("SELECT status, c_id, m_id FROM game WHERE name = %s", (gameName,))
+	cur = db.tquery("SELECT status, c_id, m_id, text FROM game WHERE name = %s", (gameName,))
 	game = cur.fetchall()
 	gameStatus = game[0][0]
 	guID = game[0][1]
 	gmID = game[0][2]
+	hasUserText = game[0][3]
 	cur = db.tquery("SELECT u.first_name, u.last_name, u.username, gu.c_id, gu.m_id FROM game_user gu INNER JOIN user u ON u.u_id = gu.c_id WHERE gu.g_name = %s", (gameName,))
 	tmpUser = cur.fetchall()
 	userID = []
@@ -112,7 +117,13 @@ def updateMessage(context, gameName):
 	message = createMessage(tmpUser, gameName, gameStatus)
 
 	if gameStatus == "aktiv":
-		admin_markup = adminKeyinactive()
+		if len(tmpUser) != 0:
+			if hasUserText:
+				admin_markup = adminKeyactive()
+			else:
+				admin_markup = adminKeyinactive()
+		else:
+			admin_markup = adminKey()
 		user_markup = userKey()
 	else:
 		admin_markup = None
