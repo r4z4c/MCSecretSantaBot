@@ -311,7 +311,7 @@ def buttonHandler(update, context):
 				db.commit()
 				updateMessage(context, gameName)
 				cur = db.tquery("SELECT text FROM game WHERE name = %s", (gameName,))
-				userHasText = db.commit()
+				userHasText = cur.fetchall()
 				print(userHasText)
 				if userHasText == 1:
 					gtext.append([update.message.from_user.id, update.message.message_id+1])
