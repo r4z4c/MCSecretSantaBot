@@ -127,16 +127,19 @@ def updateMessage(context, gameName):
 	context.bot.edit_message_text(text=message, chat_id=guID, message_id=gmID, reply_markup=admin_markup)
 
 def checkUser(update, context):
-	cur = db.squery("SELECT u_id FROM user")
+	cur = db.squery("SELECT u_id, first_name, last_name, username FROM user")
 	allUsers = cur.fetchall()
-	theUsers = []
-	for row in allUsers:
-		theUsers.append(int(row[0]))
+	theUser = []
+	for user in allUsers:
+		if user[0] == update.message.from_user.id:
+			theUser = user[0]
 
-	if update.message.from_user.id not in theUsers:
+	if len(theUser) == 0:
 		cur = db.tquery("INSERT INTO user (u_id, first_name, last_name, username) VALUES (%s, %s, %s, %s)", (update.message.from_user.id, ("" if update.message.from_user.first_name == None else update.message.from_user.first_name), ("" if update.message.from_user.last_name == None else update.message.from_user.last_name), update.message.from_user.username))
 		db.commit()
-
+	elif (update.message.from_user.first_name != thUser[1] || update.message.from_user.last_name != theUser[2] || update.message.from_user.username != theUser[3])
+		cur = db.tquery("UPDATE  user SET first_name=%s, last_name=%s, username=%s", (update.message.from_user.first_name, update.message.from_user.last_name, update.message.from_user.username))
+		db.commit()
 	return True
 
 def checkReply(update):
