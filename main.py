@@ -228,7 +228,8 @@ def joingame(update, context, gameName):
 		context.bot.send_message(chat_id=update.message.chat_id, text="Du bist drin!")
 		updateMessage(context, gameName)
 		cur = db.tquery("SELECT text FROM game WHERE name = %s", (gameName,))
-		userHasText = db.commit()
+		userHasText = db.commit()[0]
+		print(gameName)
 		print(userHasText)
 		if userHasText == 1:
 			gtext.append([update.message.from_user.id, update.message.message_id+1])
